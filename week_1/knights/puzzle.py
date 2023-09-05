@@ -15,16 +15,16 @@ CKnave = Symbol("C is a Knave")
 # setup a knowledge base that will be true for all circumstance
 KnowledgeBase = And(
     # A can either be a knight or a knave but not both
-    Or(AKnight, AKnave), Not(And(AKnight, AKnave))
+    Or(AKnight, AKnave), Not(And(AKnight, AKnave)),
     # B can either be a knight or a knave but not both
-    Or(BKnight, BKnave), Not(And(BKnight, BKnave))
+    Or(BKnight, BKnave), Not(And(BKnight, BKnave)),
     # C can either be a knight or a knave but not both
     Or(CKnight, CKnave), Not(And(CKnight, CKnave))
 )
 
 # Puzzle 0
 # A says "I am both a knight and a knave."
-knowledge0 = And(KnowledgeBase, 
+knowledge0 = And(KnowledgeBase,
 )
 
 # Puzzle 1
