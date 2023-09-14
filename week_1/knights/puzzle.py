@@ -72,6 +72,12 @@ knowledge3 = And(
     Implication(BKnight, Or(Implication(AKnight, BKnave), Implication(AKnave, BKnave)))
     # B is a knave
     Implication(BKnight, Or(Implication(AKnight, Not(BKnave)), Implication(AKnave, Not(BKnave))))
+    # 3rd statement
+    # B is a Knight
+    Implication(BKnight, CKnave),
+    # B is a Knave
+    Implication(BKnave, Not(CKnave))
+    
     
 
     # TODO
