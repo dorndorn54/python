@@ -44,14 +44,12 @@ knowledge1 = And(
 # B says "We are of different kinds."
 knowledge2 = And(
     KnowledgeBase,
-    # A is a knave
-    Implication(AKnave, Or(Not(And(AKnave, BKnave)), Not(And(AKnight, BKnight)))),
-    # A is a knight
-    Implication(AKnight, Or(And(AKnave, BKnave), And(AKnight, BKnight))),
-    # B is a knight
+    # A statement
+    Implication(AKnight, Or(And(AKnight, BKnight), And(AKnave, BKnave))),
+    Implication(AKnave, Not(Or(And(AKnight, BKnight), And(AKnave, BKnave)))),
+    # B statement
     Implication(BKnight, Or(And(AKnave, BKnight), And(AKnight, BKnave))),
-    # B is a knave
-    Implication(BKnave, Or(Not(And(AKnave, BKnight)), Not(And(AKnight, BKnave))))
+    Implication(BKnave, Not(Or(And(AKnight, BKnave), And(AKnave, BKnight)))) 
 )
 
 # Puzzle 3
@@ -69,18 +67,21 @@ knowledge3 = And(
 
     # 2nd statement
     # B is a knight
-    Implication(BKnight, Or(Implication(AKnight, BKnave), Implication(AKnave, BKnave)))
+    Implication(BKnight, Or(Implication(AKnight, BKnave), Implication(AKnave, BKnave))),
     # B is a knave
-    Implication(BKnight, Or(Implication(AKnight, Not(BKnave)), Implication(AKnave, Not(BKnave))))
+    Implication(BKnight, Or(Implication(AKnight, Not(BKnave)), Implication(AKnave, Not(BKnave)))),
+
     # 3rd statement
     # B is a Knight
     Implication(BKnight, CKnave),
     # B is a Knave
-    Implication(BKnave, Not(CKnave))
-    
-    
+    Implication(BKnave, Not(CKnave)),
 
-    # TODO
+    # 4th statement
+    # C is a knight
+    Implication(CKnight, AKnight),
+    # C is a knave
+    Implication(CKnave, Not(AKnight))
 )
 
 
