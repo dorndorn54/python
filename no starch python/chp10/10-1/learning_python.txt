@@ -1,0 +1,4 @@
+in python you can produce lists and work with them
+in python you can use conditional statements to produce a desired outcome
+in python you can use functions to split up your code
+in python you can create classes of different objects

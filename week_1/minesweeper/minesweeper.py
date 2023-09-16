@@ -204,7 +204,7 @@ class MinesweeperAI():
         self.moves_made.add(cell)
         # 2) mark the cell as safe as it did not hit a bomb
         self.safes.add(cell)
-        # 3) add a new sentence 
+        # 3) add a new sentence
         # need to exclude cells that are safe
 
     def make_safe_move(self):
