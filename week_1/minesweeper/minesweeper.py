@@ -146,7 +146,6 @@ class Sentence():
         # no action taken if the cell is not inside
 
 
-
 class MinesweeperAI():
     """
     Minesweeper game player
@@ -201,7 +200,12 @@ class MinesweeperAI():
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
-        raise NotImplementedError
+        # 1) store cell clicked as a move
+        self.moves_made.add(cell)
+        # 2) mark the cell as safe as it did not hit a bomb
+        self.safes.add(cell)
+        # 3) add a new sentence 
+        # need to exclude cells that are safe
 
     def make_safe_move(self):
         """
@@ -212,7 +216,11 @@ class MinesweeperAI():
         This function may use the knowledge in self.mines, self.safes
         and self.moves_made, but should not modify any of those values.
         """
-        raise NotImplementedError
+        for move in self.safes:
+            if move not in self.moves_made:
+                return move
+            else:
+                return None
 
     def make_random_move(self):
         """
@@ -221,4 +229,13 @@ class MinesweeperAI():
             1) have not already been chosen, and
             2) are not known to be mines
         """
-        raise NotImplementedError
+        # generate all potential moves
+        all_moves = [(i, j) for i in range(self.height-1) for j in range(self.width-1)]
+        # remove already chosen and mine identified cells
+        potential_moves = list(all_moves.difference(self.mines, self.moves_made))
+        # if there is no moves return None
+        if len(potential_moves) == 0:
+            return None
+        # if there are moves return a random one
+        else:
+            return random.choice(potential_moves)
