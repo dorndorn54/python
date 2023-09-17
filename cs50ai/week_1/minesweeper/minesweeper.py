@@ -202,10 +202,52 @@ class MinesweeperAI():
         """
         # 1) store cell clicked as a move
         self.moves_made.add(cell)
-        # 2) mark the cell as safe as it did not hit a bomb
-        self.safes.add(cell)
-        # 3) add a new sentence
-        # need to exclude cells that are safe
+
+        # 2) mark the cell as safe
+        if cell not in self.safes:
+            self.mark_safe(cell)
+
+        # 3) get the neighbours back remmove all safes and moves made if any
+        # then create the knowledge base
+
+        # store the tuple in a list
+        neighbours = set()
+        countmines = 0
+        # unpack the tuple
+        i, j = cell
+        # parameters
+        surrounding_rows, surrounding_col = range(i-1, i+1), range(j-1, j+2)
+        height_lim, width_lim = range(self.height), range(self.width)
+
+        for row in surrounding_rows:
+            if row in height_lim:
+                for col in surrounding_col:
+                    if col in width_lim:
+                        if (row, col) in self.mines:
+                            countmines += 1
+                        neighbours.add((row, col))
+
+        neighbours -= (self.moves_made | self.safes | self.mines)
+
+        # initalise the sentence class
+        new_sentence = Sentence(neighbours, count - countmines)
+        self.knowledge.append(new_sentence)
+
+        # if known to be a mine
+        for sen in self.knowledge:
+            if sen.known_mines():
+                for cell in sen.known_mines().copy():
+                    self.mark_mine(cell)
+            if sen.known_safes():
+                for cell in sen.known_safes().copy():
+                    self.mark_safe(cell)
+
+        # need to check if the new sentence is a subset of the original set
+        for sen in self.knowledge:
+            if new_sentence.cells.issubset(sen.cells) and sen.count > 0 and new_sentence.count > 0 and new_sentence != sen:
+                new_subset = sen.cells.difference(new_sentence.cells)
+                new_subset_sentence = Sentence(list(new_subset), sen.count - new_sentence.count)
+                self.knowledge.append(new_subset_sentence)
 
     def make_safe_move(self):
         """
@@ -230,7 +272,7 @@ class MinesweeperAI():
             2) are not known to be mines
         """
         # generate all potential moves
-        all_moves = [(i, j) for i in range(self.height-1) for j in range(self.width-1)]
+        all_moves = set(tuple((i, j)) for i in range(self.height) for j in range(self.width))
         # remove already chosen and mine identified cells
         potential_moves = list(all_moves.difference(self.mines, self.moves_made))
         # if there is no moves return None
