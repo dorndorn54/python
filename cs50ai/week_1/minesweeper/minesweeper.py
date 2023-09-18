@@ -204,8 +204,7 @@ class MinesweeperAI():
         self.moves_made.add(cell)
 
         # 2) mark the cell as safe
-        if cell not in self.safes:
-            self.mark_safe(cell)
+        self.mark_safe(cell)
 
         # 3) get the neighbours back remmove all safes and moves made if any
         # then create the knowledge base
@@ -214,9 +213,9 @@ class MinesweeperAI():
         neighbours = set()
         countmines = 0
         # unpack the tuple
-        i, j = cell
+        (i, j) = cell
         # parameters
-        surrounding_rows, surrounding_col = range(i-1, i+1), range(j-1, j+2)
+        surrounding_rows, surrounding_col = range(i-1, i+2), range(j-1, j+2)
         height_lim, width_lim = range(self.height), range(self.width)
 
         for row in surrounding_rows:
@@ -235,6 +234,9 @@ class MinesweeperAI():
 
         # if known to be a mine
         for sen in self.knowledge:
+            # if empty then remove it 
+            if len(sen.cells) == 0:
+                self.knowledge.remove(sen)
             if sen.known_mines():
                 for cell in sen.known_mines().copy():
                     self.mark_mine(cell)
@@ -258,11 +260,10 @@ class MinesweeperAI():
         This function may use the knowledge in self.mines, self.safes
         and self.moves_made, but should not modify any of those values.
         """
-        for move in self.safes:
-            if move not in self.moves_made:
-                return move
-            else:
-                return None
+        for cell in self.safes:
+            if cell not in self.moves_made:
+                return cell
+            return None
 
     def make_random_move(self):
         """
@@ -276,8 +277,8 @@ class MinesweeperAI():
         # remove already chosen and mine identified cells
         potential_moves = list(all_moves.difference(self.mines, self.moves_made))
         # if there is no moves return None
-        if len(potential_moves) == 0:
-            return None
+        if len(potential_moves) != 0:
+            return random.choice(potential_moves)
         # if there are moves return a random one
         else:
-            return random.choice(potential_moves)
+            return None
