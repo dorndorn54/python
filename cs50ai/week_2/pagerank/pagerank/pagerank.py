@@ -8,6 +8,10 @@ SAMPLES = 10000
 
 
 def main():
+    """
+    expects a command line argument which will be the name of the directory
+    to search through to compute PageRanks
+    """
     if len(sys.argv) != 2:
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
@@ -57,7 +61,32 @@ def transition_model(corpus, page, damping_factor):
     linked to by `page`. With probability `1 - damping_factor`, choose
     a link at random chosen from all pages in the corpus.
     """
-    raise NotImplementedError
+    # initalising the dict
+    dict_probability = {}
+    # acces the dict using the page value
+    dict_value_list = corpus[page]
+    # page count excluding the page key
+    page_count = len(dict_value_list)
+
+    if page_count != 0:
+        # calculating the neccesary values needed
+        prob_value = (damping_factor / page_count)
+        residual_value = (1 - damping_factor) / (page_count + 1)
+        sum_value = prob_value + residual_value
+        for i in dict_value_list:
+            dict_probability[i] = sum_value
+        # add the page user is on probability
+        dict_probability.update((corpus[page], residual_value))
+    if page_count == 0:
+        # calculate the necessary values
+        sum_value = 1 / len(corpus)
+        # store all the keys in the corpus in a list
+        corpus_list = list(corpus.keys())
+        # generate a dictionary key is the corpus.keys and the value is the probability
+        for i in corpus_list:
+            dict_probability[i] = sum_value
+    # finally return the dictionary
+    return dict_probability
 
 
 def sample_pagerank(corpus, damping_factor, n):
