@@ -63,15 +63,15 @@ def transition_model(corpus, page, damping_factor):
     """
     # initalising the dict
     dict_probability = {}
-    # acces the dict using the page value
-    dict_value_list = corpus[page]
+    # acces the dict using the page value and convert the value into list
+    dict_value_list = list(corpus[page])
     # page count excluding the page key
     page_count = len(dict_value_list)
 
     if page_count != 0:
         # calculating the neccesary values needed
         prob_value = (damping_factor / page_count)
-        residual_value = (1 - damping_factor) / (page_count + 1)
+        residual_value = (1 - damping_factor) / len(corpus)
         sum_value = prob_value + residual_value
         for i in dict_value_list:
             dict_probability[i] = sum_value
@@ -82,7 +82,8 @@ def transition_model(corpus, page, damping_factor):
         sum_value = 1 / len(corpus)
         # store all the keys in the corpus in a list
         corpus_list = list(corpus.keys())
-        # generate a dictionary key is the corpus.keys and the value is the probability
+        # generate a dictionary key is the corpus.keys
+        # and the value is the prob
         for i in corpus_list:
             dict_probability[i] = sum_value
     # finally return the dictionary
