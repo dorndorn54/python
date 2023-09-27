@@ -68,7 +68,7 @@ def transition_model(corpus, page, damping_factor):
         # pulling the keys from the value of page
         dict_value_list = list(corpus[page])
         # calculating the neccesary values needed
-        prob_value = damping_factor / len(dict_value_list)
+        prob_value = damping_factor / len(corpus[page])
         residual_value = (1 - damping_factor) / len(corpus)
         sum_value = prob_value + residual_value
         for i in dict_value_list:
@@ -102,11 +102,11 @@ def sample_pagerank(corpus, damping_factor, n):
     damping factor is the value
     n is the number of samples that should be generated
     """
-    prob_distribution = corpus.copy()
+    prob_distribution = {page_name: 0 for page_name in corpus}
     for k in prob_distribution:
         prob_distribution[k] = 0
     curr_page = random.choice(list(prob_distribution))
-    prob_distribution[curr_page] += 1/n
+    prob_distribution[curr_page] += 1
 
     for i in range(0, n-1):
         trans_model = transition_model(corpus, curr_page, damping_factor)
@@ -120,10 +120,15 @@ def sample_pagerank(corpus, damping_factor, n):
                 curr_page = page_name
                 break
 
-        prob_distribution += 1/n
+        prob_distribution[curr_page] += 1
+        
+    # loop through every value and divide by the sample size
+    prob_distribution = {key: value/n for key, value in prob_distribution.items()}
 
     # to round everything off so the probability sum is 1
-    print(sum(prob_distribution.values()))
+    print("The total sum of the probability is " +str(sum(prob_distribution.values())))
+    # return the dictionary
+    return prob_distribution
 
 
 def iterate_pagerank(corpus, damping_factor):
@@ -135,8 +140,12 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    # copy the corpus and reassigns the values
+    page_rank = corpus.copy()
+    for i in page_rank:
+        page_rank[i] = 1/len(corpus)
 
+    # repeatedly perform the calculation till change is less than 0.001
 
 if __name__ == "__main__":
     main()
