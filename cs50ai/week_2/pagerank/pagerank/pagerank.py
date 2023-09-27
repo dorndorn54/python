@@ -63,21 +63,20 @@ def transition_model(corpus, page, damping_factor):
     """
     # initalising the dict
     dict_probability = {}
-    # acces the dict using the page value and convert the value into list
-    dict_value_list = list(corpus[page])
-    # page count excluding the page key
-    page_count = len(dict_value_list)
 
-    if page_count != 0:
+    if len(corpus[page]) != 0:
+        # pulling the keys from the value of page
+        dict_value_list = list(corpus[page])
         # calculating the neccesary values needed
-        prob_value = (damping_factor / page_count)
+        prob_value = damping_factor / len(dict_value_list)
         residual_value = (1 - damping_factor) / len(corpus)
         sum_value = prob_value + residual_value
         for i in dict_value_list:
             dict_probability[i] = sum_value
         # add the page user is on probability
-        dict_probability.update((corpus[page], residual_value))
-    if page_count == 0:
+        dict_update = {"corpus[page]": residual_value}
+        dict_probability.update(dict_update)
+    if len(corpus[page]) == 0:
         # calculate the necessary values
         sum_value = 1 / len(corpus)
         # store all the keys in the corpus in a list
@@ -98,8 +97,33 @@ def sample_pagerank(corpus, damping_factor, n):
     Return a dictionary where keys are page names, and values are
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
+
+    corpus is the dict
+    damping factor is the value
+    n is the number of samples that should be generated
     """
-    raise NotImplementedError
+    prob_distribution = corpus.copy()
+    for k in prob_distribution:
+        prob_distribution[k] = 0
+    curr_page = random.choice(list(prob_distribution))
+    prob_distribution[curr_page] += 1/n
+
+    for i in range(0, n-1):
+        trans_model = transition_model(corpus, curr_page, damping_factor)
+
+        rand_val = random.random()
+        total_prob = 0
+
+        for page_name, probability in trans_model.items():
+            total_prob += probability
+            if rand_val <= probability:
+                curr_page = page_name
+                break
+
+        prob_distribution += 1/n
+
+    # to round everything off so the probability sum is 1
+    print(sum(prob_distribution.values()))
 
 
 def iterate_pagerank(corpus, damping_factor):
