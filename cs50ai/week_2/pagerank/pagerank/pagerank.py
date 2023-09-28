@@ -132,19 +132,50 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
+    # set threshold of convergence to be +/- 0.001
+    threshold = 0.001
     # copy the corpus and reassigns the values
-    page_rank = corpus.copy()
-    for i in page_rank:
-        page_rank[i] = 1/len(corpus)
+    # assign each page a rank of 1 / N N is the total number of pages in the corpus
+    page_rank = dict()
+    
+    N = len(corpus)
+    for key in corpus:
+        page_rank[key] = 1/N
+    copy_page_rank = page_rank.copy()
+    
+    # function should repeatedly calculate new rank values based on the curren rank value
+        # a page that has no links should link to all pages 
+        # repeat till the change of pagerank is less than 0.001
 
-    # PR(p) be the PageRank of a given page p
-    # 1-d surfer chose a page and ended up on page p
-    # with probability d follows a link from page i to page p
+    # the dictionary that we are appending to has been called page_rank
+    while True:
+        # first condition
+        first_condition = (1 - damping_factor) / len(corpus)
+        # looping through all the pages one time
+        for key in corpus:
+            # holding value for the loop to add below
+            summation_value = 0.0
+            # iterate through every value obtaining the
+            for page in corpus[key]:
+                summation_value += page_rank[page] / len(corpus[page])
+            # second condition
+            second_condition = damping_factor * summation_value
 
-    # first ondition is 1-d/N
-    # repeatedly perform the calculation till change is less than 0.001
+            # append the sum of the two conditions into the new page_rank
+            copy_page_rank[key] = (first_condition + second_condition)
 
-        
+        # compare the two dicts if the diff between the two is less than 0.001 return the copy 
+        # if more than 0.001 copy the values of the copy_page_rank to page_rank and wipe page_rank and try again
+        threshold_counter = 0
+        for key in page_rank and copy_page_rank:
+            if abs(page_rank[key] - copy_page_rank[key]) > threshold:
+                threshold_counter += 1
+
+        if threshold_counter == 0:
+            return copy_page_rank
+        if threshold_counter > 0:
+            page_rank = copy_page_rank
+
 
 if __name__ == "__main__":
     main()
