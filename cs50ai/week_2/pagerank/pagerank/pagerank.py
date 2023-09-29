@@ -133,7 +133,7 @@ def iterate_pagerank(corpus, damping_factor):
     PageRank values should sum to 1.
     """
     # math values used in the equation
-    threshold = 0.0005
+    threshold = 0.001
     N = len(corpus)
 
     # setting up the page_rank dictionary
