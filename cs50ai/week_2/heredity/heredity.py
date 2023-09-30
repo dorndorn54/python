@@ -42,6 +42,9 @@ def main():
     # Check for proper usage
     if len(sys.argv) != 2:
         sys.exit("Usage: python heredity.py data.csv")
+    # loading a dictionary
+    # the key is the name and the value is another dict of information of the person
+    # true if they have trait false if they dont have trait
     people = load_data(sys.argv[1])
 
     # Keep track of gene and trait probabilities for each person
@@ -139,7 +142,44 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
+    # value to multiply later to return
+    joint_probability = 1
+    # the loop to calculate the joint probability
+    # cover each case of one gene two gene and no gene
+    for person in people:
+        # no_gene, one_gene, two_gene
+        person_genes = (2 if person in two_genes else 1 if person in one_gene else 0)
+
+        # if there is no parents use standard calculation
+        # to calculate the probability they have a particular number of gene
+        gene_probability = 1
+        mother = people[person]['mother']
+        father = people[person]['father']
+
+        if not mother and not father:
+            gene_probability *= PROBS["gene"][person_genes]
+
+        # if there is parent then use function calculation
+        else:
+            # use a function to call it twice for both mother and father
+            mother_probability = inherit_prob(mother, one_gene, two_genes)
+            father_probability = inherit_prob(father, one_gene, two_genes)
+
+            # calculate for the kid the probability of him getting 0, 1, 2
+            # based on the request of the function call
+
+
+def inherit_prob(parent, one_gene, two_genes):
+    # parent with no_gene
+    if parent not in one_gene or two_genes:
+        return PROBS["mutation"]      
+    # parent with one_gene
+    if parent in one_gene:
+        return 0.5
+    # parent with two_genes
+    if parent in two_genes:
+        return 1 - PROBS["mutation"]
+
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
