@@ -1,6 +1,7 @@
+data = {
+    'Student 1': {'Name': 'Bobby', 'Id': 1, "Age": 20},
+    'Student 2': {'Name': 'ojaswi', 'Id': 2, "Age": 22},
+    'Student 3': {'Name': 'rohith', 'Id': 3, "Age": 20},
+}
 
-mydict = {"1.html": {"2.html", "3.html"}, "2.html": {"3.html"}, "3.html": {"2.html"}}
-mydict_2 = {"1.html": {"2.html", "3.html"}, "2.html": {"3.html"}, "3.html": {"3.html"}}
 
-mydict = mydict_2
-print(mydict)
