@@ -167,16 +167,16 @@ def joint_probability(people, one_gene, two_genes, have_trait):
 
             # calculate for the kid the probability of him getting 0, 1, 2
             # based on the request of the function call
-            if person_genes == 2:
-                # each parent give one
-                gene_probability *= mother_probability * father_probability
-            if person_genes == 1:
-                # one of the parent give one
-                # gets from mother not father and gets from father not mother
-                gene_probability *= (mother_probability) * (1 - father_probability) + (father_probability) * (1 - mother_probability)
-            if person_genes == 0:
-                # neither of the parents give the gene
-                gene_probability *= (1 - mother_probability) * (1 - father_probability)
+            match person:
+                case 2:
+                    gene_probability *= mother_probability * father_probability
+                case 1:
+                    # one of the parent give one
+                    # gets from mother not father and gets from father not mother
+                    gene_probability *= (mother_probability) * (1 - father_probability) + (father_probability) * (1 - mother_probability)
+                case 0:
+                    # neither of the parents give the gene
+                    gene_probability *= (1 - mother_probability) * (1 - father_probability)
 
         # consider the have trait part of the calculation
         # last part is to determine if the person is in have_trait
@@ -185,6 +185,7 @@ def joint_probability(people, one_gene, two_genes, have_trait):
 
     # return the entire joint probability calculation back to the function
     return joint_probability
+
 
 def inherit_prob(parent, one_gene, two_genes):
     # parent with no_gene
@@ -219,10 +220,17 @@ def normalize(probabilities):
         # calculate the factor value
         gene_factor = 1 / sum(probabilities[person]["gene"].values())
         trait_factor = 1 / sum(probabilities[person]["trait"].values())
-        
+
         # iterate through each person gene and divide each value by the gene factor
         # do the same for the trait factor
+        for gene_count in probabilities[person]["gene"].key():
+            probabilities[person]["gene"][gene_count] /= gene_factor
+        for trait_factor in probabilities[person]["trait"].key():
+            probabilities[person]["trait"][trait_factor] /= trait_factor
 
+    # return the dictionary
+    return probabilities
+  
 
 if __name__ == "__main__":
     main()
