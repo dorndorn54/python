@@ -235,7 +235,7 @@ def normalize(probabilities):
 
     # return the dictionary
     return normalised
-  
+
 
 if __name__ == "__main__":
     main()
