@@ -208,10 +208,10 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     the person is in `have_gene` and `have_trait`, respectively.
     """
     # no gene, one gene or two gene
-    person_genes = (2 if person in two_genes else 1 if person in one_gene else 0)
 
     # loop to iterate through each person
     for person in probabilities:
+        person_genes = (2 if person in two_genes else 1 if person in one_gene else 0)
         # update the gene part of the person
         probabilities[person]["gene"][person_genes] += p
         # update the trait part of the person
@@ -223,21 +223,18 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
+    normalised = probabilities.copy()
     # access one person(key) in the probabilities dictionary
     for person in probabilities:
-        # calculate the factor value
-        gene_factor = 1 / sum(probabilities[person]["gene"].values())
-        trait_factor = 1 / sum(probabilities[person]["trait"].values())
-
-        # iterate through each person gene and divide each value by the gene factor
-        # do the same for the trait factor
-        for gene_count in probabilities[person]["gene"].key():
-            probabilities[person]["gene"][gene_count] /= gene_factor
-        for trait_factor in probabilities[person]["trait"].key():
-            probabilities[person]["trait"][trait_factor] /= trait_factor
+        for typ in probabilities[person].keys():
+            factor = sum(probabilities[person][typ].values())
+            for category in probabilities[person][typ]:
+                initial_value = probabilities[person][typ][category]
+                normalised_value = initial_value / factor
+                normalised[person][typ][category] = normalised_value
 
     # return the dictionary
-    return probabilities
+    return normalised
   
 
 if __name__ == "__main__":
