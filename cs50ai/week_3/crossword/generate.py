@@ -110,7 +110,26 @@ class CrosswordCreator():
                 # if do not match remove
                 if var_len != value:
                     self.domains[var].remove(value)
+                    
 
+    def check_overlap(self, x_iter , y_iter, x, y):
+        """_return false if nothing to check
+            returns a tuple of (i, j) x, y if math_
+
+        Args:
+            x_iter (_type_): _position of x_
+            y_iter (_type_): _position of y_
+        """
+        if self.crossword.overlaps[x, y] == None:
+            return True
+        else:
+            # check if they match
+            if x[x_iter] == y[y_iter]:
+                return True
+            else:
+                return False
+            
+    
     def revise(self, x, y):
         """
         Make variable `x` arc consistent with variable `y`.
@@ -120,7 +139,21 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        raise NotImplementedError
+        revised = False
+        to_del = set()
+
+        for x_iter in self.domains[x]:
+            for y_iter in self.domains[y]:
+                # True if no overlap or no mismatch
+                # False if mismatch
+                if self.check_overlap(x_iter, y_iter, x, y) is False:
+                    to_del.add(x_iter)
+                    revised = True
+
+        for word in to_del:
+            self.domains[x].remove(word)
+
+        return revised
 
     def ac3(self, arcs=None):
         """
@@ -138,7 +171,11 @@ class CrosswordCreator():
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
-        raise NotImplementedError
+        for word in assignment.values():
+            if len(word) == 0:
+                return False
+            else:
+                return True
 
     def consistent(self, assignment):
         """
