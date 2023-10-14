@@ -1,4 +1,5 @@
 import sys
+import random
 
 from crossword import *
 
@@ -110,9 +111,8 @@ class CrosswordCreator():
                 # if do not match remove
                 if var_len != value:
                     self.domains[var].remove(value)
-                    
 
-    def check_overlap(self, x_iter , y_iter, x, y):
+    def check_overlap(self, x_iter, y_iter, x, y):
         """_return false if nothing to check
             returns a tuple of (i, j) x, y if math_
 
@@ -120,7 +120,7 @@ class CrosswordCreator():
             x_iter (_type_): _position of x_
             y_iter (_type_): _position of y_
         """
-        if self.crossword.overlaps[x, y] == None:
+        if self.crossword.overlaps[x, y] is None:
             return True
         else:
             # check if they match
@@ -128,8 +128,7 @@ class CrosswordCreator():
                 return True
             else:
                 return False
-            
-    
+
     def revise(self, x, y):
         """
         Make variable `x` arc consistent with variable `y`.
@@ -164,7 +163,18 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        raise NotImplementedError
+        # if empty then form an arc with every other thing
+        if arcs is None:
+            queue = list()
+            for x in self.domains:
+                for y in self.domains:
+                    if x != y:
+                        queue.append((x, y))
+        # if there is already arcs then just transfer to the queue
+        else:
+            queue = list()
+            for arc in arcs:
+                queue.append(arc)
 
     def assignment_complete(self, assignment):
         """
@@ -181,8 +191,31 @@ class CrosswordCreator():
         """
         Return True if `assignment` is consistent (i.e., words fit in crossword
         puzzle without conflicting characters); return False otherwise.
+
+        all values are distinct
+        every value is the correct length
+        no conflicts between neighbouring values
         """
-        raise NotImplementedError
+        # check if they are distinct no match
+        dict_values = assignment.values()
+        if len(dict_values) != len(set(dict_values)):
+            return False
+        # check if they are correct length
+        # the variable must match the string length
+        for keys, values in assignment.items():
+            if len(keys) != len(values):
+                return False
+        # check if they conflict
+        # checker to prevent entering same values
+        for variables in assignment.keys():
+            # collect the neighbours data
+            neighbours = self.crossword.neighbors(variables)
+            # iterate through the neighbours and obtain
+            for neighbour in neighbours:
+                pos_1, pos_2 = self.crossword.overlaps[variables, neighbour]
+                if variables[pos_1] != neighbour[pos_2]:
+                    return False
+        return True
 
     def order_domain_values(self, var, assignment):
         """
@@ -190,8 +223,37 @@ class CrosswordCreator():
         the number of values they rule out for neighboring variables.
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
+
+        var is a list of words that can fit inside the variable
+        meant to iterate through var and check against empty neighbours
+        if neighbour is in assignment then skip
+        if not then check against the the values in the neighbour
+        if they do not match then eliminate the value
         """
-        raise NotImplementedError
+        # use a dictionary to sort words of var and their elimination count
+        elim_words = dict()
+        # obtain the neighburs of var
+        neighbours = self.crossword.neighbors(var)
+        # iterate through a list of the var
+        for word in self.domains[var]:
+            elim = 0
+            for neighbour in neighbours:
+                if neighbour in assignment.keys():
+                    continue
+                else:
+                    # calculate overlap point
+                    var_overlap, neighbour_overlap = self.crossword.overlaps[var, neighbour]
+                    # iterate through the potential neighbour words to check
+                    for neighbour_word in self.domains[neighbour]:
+                        # if mismatch then add to elim value
+                        if word[var_overlap] != neighbour_word[neighbour_overlap]:
+                            elim += 1
+            # append the word and the associated elim counter value to the dict
+            elim_words[word] = elim
+        # sort the dictionary values and convert it to a list
+        sorted_elim = (sorted(elim_words, key=lambda x: elim_words[x])).keys()
+        # return the dict
+        return sorted_elim
 
     def select_unassigned_variable(self, assignment):
         """
@@ -201,7 +263,26 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
-        raise NotImplementedError
+        lowest_value = None
+        lowest_variable = list()
+
+        # iterate through the assignment dict
+        for key, value in assignment.items():
+            if lowest_value is None or len(value) < lowest_value:
+                lowest_value = len(value)
+                lowest_variable = key
+            elif len(value) == lowest_value:
+                # calculate the degree
+                current_degree = len(self.crossword.neighbors(lowest_value))
+                incoming_degree = len(self.crossword.neighbors(key))
+                # if incoming more degree then replace
+                if current_degree < incoming_degree:
+                    lowest_variable = key
+                # if they are the same let random choose arbitrarily
+                elif current_degree == incoming_degree:
+                    lowest_variable = random.choice([lowest_variable, key])
+        # send the lowest word back
+        return lowest_variable
 
     def backtrack(self, assignment):
         """
