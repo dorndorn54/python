@@ -100,17 +100,16 @@ class CrosswordCreator():
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
-        # copy the domain cannot to prevent error
+        # copy the dictionary to iterate
         iter_domain = self.domains.copy()
-        # the key is the variable, the value is a set of values associated to the key
-        for var in iter_domain:
-            # calculate the length of the variable
-            var_len = len(var)
-            # iterate over each value in the set associated with the var
-            for value in iter_domain[var]:
-                # if do not match remove
-                if var_len != value:
-                    self.domains[var].remove(value)
+        # iterate over the key
+        for variable in iter_domain.key():
+            # iterate over the values associated with the key
+            for value in iter_domain[variable]:
+                # check the value associated with the key match
+                if len(variable) != value:
+                    # if no match then remove
+                    self.domains[variable].remove(value)
 
     def check_overlap(self, x_iter, y_iter, x, y):
         """_return false if nothing to check
@@ -163,18 +162,26 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
+        queue = list()
         # if empty then form an arc with every other thing
         if arcs is None:
-            queue = list()
-            for x in self.domains:
-                for y in self.domains:
-                    if x != y:
-                        queue.append((x, y))
+            for x_val in self.domains:
+                for y_val in self.domains:
+                    if x_val != y_val:
+                        queue.append((x_val, y_val))
         # if there is already arcs then just transfer to the queue
+        # avoid using assignment as it will then point to the orignal copy
         else:
-            queue = list()
-            for arc in arcs:
-                queue.append(arc)
+            queue = arcs.copy()
+
+        while len(queue) > 0:
+            (x_val, y_val) = queue.pop()
+            if self.revise(x_val, y_val):
+                if len(x_val) == 0:
+                    return False
+                for x_neighbours in (self.crossword.neighbours(x_val) - y_val):
+                    queue.insert(0, (x_neighbours, x_val))
+        return True
 
     def assignment_complete(self, assignment):
         """
@@ -293,7 +300,19 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        raise NotImplementedError
+        if assignment:
+            return assignment
+        var = self.select_unassigned_variable(assignment)
+        for value in self.order_domain_values(var, assignment):
+            # assign a value first to test
+            assignment[var] = value
+            if self.consistent(assignment):
+                assignment[var] = value
+                result = self.backtrack(assignment)
+                if result is not None:
+                    return result
+                assignment.pop(var)
+        return None
 
 
 def main():
