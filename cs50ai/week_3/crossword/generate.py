@@ -101,17 +101,17 @@ class CrosswordCreator():
          constraints; in this case, the length of the word.)
         """
         # copy the dictionary to iterate
-        iter_domain = self.domains.copy()
+        iter_domain = self.domains.deepcopy()
         # iterate over the key
-        for variable in iter_domain.key():
+        for domain in iter_domain.keys():
             # iterate over the values associated with the key
-            for value in iter_domain[variable]:
+            for value in iter_domain[domain]:
                 # check the value associated with the key match
-                if len(variable) != value:
+                if domain.length != len(value):
                     # if no match then remove
-                    self.domains[variable].remove(value)
+                    self.domains[domain].remove(value)
 
-    def check_overlap(self, x_iter, y_iter, x, y):
+    def check_overlap(self, x, y, x_iter, y_iter):
         """_return false if nothing to check
             returns a tuple of (i, j) x, y if math_
 
@@ -119,12 +119,17 @@ class CrosswordCreator():
             x_iter (_type_): _position of x_
             y_iter (_type_): _position of y_
         """
-        if self.crossword.overlaps[x, y] is None:
+        # no overlap nothing to satisfy
+        if not self.crossword.overlaps[x, y]:
             return True
         else:
             # check if they match
-            if x[x_iter] == y[y_iter]:
+            x_index, y_index = self.crossword.overlaps[x, y]
+            # indexing into the x word at x pos and y word into the y position
+            # if match then reteurn True
+            if x_iter[x_index] == y_iter[y_index]:
                 return True
+            # no match return False
             else:
                 return False
 
@@ -141,16 +146,19 @@ class CrosswordCreator():
         to_del = set()
 
         for x_iter in self.domains[x]:
+            consistent = False
             for y_iter in self.domains[y]:
                 # True if no overlap or no mismatch
                 # False if mismatch
-                if self.check_overlap(x_iter, y_iter, x, y) is False:
-                    to_del.add(x_iter)
-                    revised = True
+                if x_iter != y_iter and self.check_overlap(x, y, x_iter, y_iter):
+                    consistent = True
+                    break
 
-        for word in to_del:
-            self.domains[x].remove(word)
+            if not consistent:
+                to_del.add(x_iter)
+                revised = True
 
+        self.domains[x] -= to_del
         return revised
 
     def ac3(self, arcs=None):
@@ -175,12 +183,12 @@ class CrosswordCreator():
             queue = arcs.copy()
 
         while len(queue) > 0:
-            (x_val, y_val) = queue.pop()
+            x_val, y_val = queue.pop()
             if self.revise(x_val, y_val):
-                if len(x_val) == 0:
+                if self.domains[x_val] == 0:
                     return False
-                for x_neighbours in (self.crossword.neighbours(x_val) - y_val):
-                    queue.insert(0, (x_neighbours, x_val))
+                for x_neighbours in self.crossword.neighbours(x_val) - {y_val}:
+                    queue.append((x_neighbours, x_val))
         return True
 
     def assignment_complete(self, assignment):
@@ -188,11 +196,11 @@ class CrosswordCreator():
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
-        for word in assignment.values():
-            if len(word) == 0:
+
+        for var in self.domains:
+            if var not in assignment:
                 return False
-            else:
-                return True
+        return True
 
     def consistent(self, assignment):
         """
