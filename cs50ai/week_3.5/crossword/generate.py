@@ -100,9 +100,28 @@ class CrosswordCreator():
          constraints; in this case, the length of the word.)
         """
         # iterate through the value of x
-        # check against the key to ensure the same length  
-        raise NotImplementedError
+        # check against the key to ensure the same length
+        for domain in self.domains:
+            to_del = list()
+            for value in self.domains[domain]:
+                if domain.length != len(value):
+                    to_del.append(value)
+            for delete in to_del:
+                self.domains[domain].remove(delete)
 
+    def check_overlap(self, x, y, x_variable, y_variable):
+        # if no overlap return False
+        if not self.crossword.overlaps[x, y]:
+            return True
+        # if overlap and they match return False
+        else:
+            x_pos, y_pos = self.crossword.overlaps[x, y]
+            # no match
+            if x_variable[x_pos] != y_variable[y_pos]:
+                return True
+            else:
+                return False
+        # if overlap and they dont match return True
     def revise(self, x, y):
         """
         Make variable `x` arc consistent with variable `y`.
@@ -112,7 +131,20 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        raise NotImplementedError
+        revised = False
+        to_del = set()
+        for x_variable in self.domains[x]:
+            consistent = True
+            for y_variable in self.domains[y]:
+                if x_variable != y_variable and self.check_overlap(x, y, x_variable, y_variable):
+                    consistent = False
+                    break
+            if not consistent:
+                to_del.add(x_variable)
+                revised = True
+
+        self.domains[x] -= to_del
+        return revised
 
     def ac3(self, arcs=None):
         """
@@ -123,21 +155,59 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        raise NotImplementedError
+        queue = list()
+        # if the arcs are none
+        if arcs is None:
+            for x_domain in self.domains:
+                for y_domain in self.domains:
+                    if x_domain != y_domain:
+                        queue.append((x_domain, y_domain))
+        else:
+            queue = arcs
+            while len(queue) != 0:
+                (x_val, y_val) = queue.pop()
+                if self.revise(x_val, y_val ):
+                    if len(self.domains[x_val]) == 0:
+                        return False
+                    for x_neighbours in self.crossword.neighbours(x_val) - {y_val}:
+                    queue.append((x_neighbours, x_val))
 
     def assignment_complete(self, assignment):
         """
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
-        raise NotImplementedError
+        for variable in assignment:
+            if len(assignment[variable]) == 0:
+                return False
+        return True
 
     def consistent(self, assignment):
         """
         Return True if `assignment` is consistent (i.e., words fit in crossword
         puzzle without conflicting characters); return False otherwise.
         """
-        raise NotImplementedError
+        used_variables = list()
+        
+        for variable in assignment:
+            value = assignment[variable]
+            
+            if value in used_variables:
+                return False
+            used_variables.append(value)
+
+            if len(value) != variable.length:
+                return False
+
+            for variable_y in self.crossword.neigbors(variable):
+                if variable_y in assignment:
+                    value_y = assignment[variable_y]
+                    
+                    if not self.check_overlap(variable, variable_y, value, value_y):
+                        return False
+
+        return True
+
 
     def order_domain_values(self, var, assignment):
         """
