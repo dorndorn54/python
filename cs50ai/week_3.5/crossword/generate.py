@@ -99,6 +99,8 @@ class CrosswordCreator():
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
+        # iterate through the value of x
+        # check against the key to ensure the same length  
         raise NotImplementedError
 
     def revise(self, x, y):
