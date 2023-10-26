@@ -12,6 +12,8 @@ IMG_HEIGHT = 30
 NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
+# to run the code arguments are filename and optional place to save the file to
+
 
 def main():
 
@@ -58,7 +60,35 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    raise NotImplementedError
+    # data dir is only a path
+    # inside there are directories that are named after each catteory
+    # inside each file would be img files
+
+    # list to hold the required data to return
+    images = list()
+    labels = list()
+    # iterate through all subfolders in the parent folder
+    for root, dirs, files in os.walk(data_dir):
+        for subfolder in dirs:
+            subfolder_path = os.path.join(root, subfolder)
+            # iterate through files in the subfolder
+            for file in os.listdir(subfolder_path):
+                file_path = os.path.join(subfolder_path, file)
+                # check if the file is correct
+                if file.lower().endswith(".ppm"):
+                    # restriction parameters
+                    new_width = IMG_WIDTH
+                    new_heigt = IMG_HEIGHT
+                    # open the image
+                    image = cv2.imread(file_path)
+                    # resize the image
+                    resized_image = cv2.resize(image, (new_width, new_heigt))
+                    # add it to the main list images
+                    images.append(resized_image)
+                    # add the image location to the list labels
+                    labels.append(subfolder)
+    # return the two listss as a tuple
+    return images, labels
 
 
 def get_model():
