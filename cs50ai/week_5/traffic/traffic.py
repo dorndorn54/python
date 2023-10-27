@@ -80,6 +80,7 @@ def load_data(data_dir):
             # adjust the image size and append it to the images list
             img = cv2.imread(os.path.join(data_dir, foldername, filename))
             img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
+            img = img / 255
             images.append(img)
             # append the labels to the labels list
             labels.append(int(foldername))
