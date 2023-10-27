@@ -67,27 +67,27 @@ def load_data(data_dir):
     # list to hold the required data to return
     images = list()
     labels = list()
-    # iterate through all subfolders in the parent folder
-    for root, dirs, files in os.walk(data_dir):
-        for subfolder in dirs:
-            subfolder_path = os.path.join(root, subfolder)
-            # iterate through files in the subfolder
-            for file in os.listdir(subfolder_path):
-                file_path = os.path.join(subfolder_path, file)
-                # check if the file is correct
-                if file.lower().endswith(".ppm"):
-                    # restriction parameters
-                    new_width = IMG_WIDTH
-                    new_heigt = IMG_HEIGHT
-                    # open the image
-                    image = cv2.imread(file_path)
-                    # resize the image
-                    resized_image = cv2.resize(image, (new_width, new_heigt))
-                    # add it to the main list images
-                    images.append(resized_image)
-                    # add the image location to the list labels
-                    labels.append(subfolder)
-    # return the two listss as a tuple
+    # first enter the main folder and iterate through the subfolder
+    for foldername in os.listdir(data_dir):
+        # check if the folder is an int if not then skip
+        try:
+            int(foldername)
+        except ValueError:
+            print("filename is not an int")
+            continue
+
+        for filename in os.listdir(os.path.join(data_dir, foldername)):
+            # adjust the image size and append it to the images list
+            img = cv2.imread(os.path.join(data_dir, foldername, filename))
+            img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
+            images.append(img)
+            # append the labels to the labels list
+            labels.append(int(foldername))
+
+    # check if the number of files match the number of labels
+    if len(images) != len(labels):
+        print("the number of files do not match the labels")
+
     return images, labels
 
 
@@ -104,7 +104,7 @@ def get_model():
         tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
 
         # max pooling layer using a 2X2 pool size (converts the big picture into a 2 by 2 picture)
-        tf.keras.layers.MaxPooling2D(pool_size =(2, 2)),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
 
         # flatten units(makes the data smaller)
         tf.keras.layers.Flatten(),
@@ -114,7 +114,7 @@ def get_model():
         tf.keras.layers.Dropout(0.5),
 
         # add an output layer with output for all 43 type of singns
-        tf.keras.layers.Dense(10, activation="softmax")
+        tf.keras.layers.Dense(43, activation="softmax")
     ])
 
     # Train neural network
