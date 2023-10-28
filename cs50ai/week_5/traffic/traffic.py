@@ -12,8 +12,6 @@ IMG_HEIGHT = 30
 NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
-# to run the code arguments are filename and optional place to save the file to
-
 
 def main():
 
@@ -60,36 +58,24 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    # data dir is only a path
-    # inside there are directories that are named after each catteory
-    # inside each file would be img files
-
-    # list to hold the required data to return
+    # declaring the lists to send off
     images = list()
     labels = list()
-    # first enter the main folder and iterate through the subfolder
-    for foldername in os.listdir(data_dir):
-        # check if the folder is an int if not then skip
-        try:
-            int(foldername)
-        except ValueError:
-            print("filename is not an int")
-            continue
 
+    # Iterate through folders in directory:
+    for foldername in os.listdir(data_dir):
+        # Iterate through images in each folder
         for filename in os.listdir(os.path.join(data_dir, foldername)):
-            # adjust the image size and append it to the images list
+            # Open each image and resize to be IMG_WIDTH X IMG HEIGHT
             img = cv2.imread(os.path.join(data_dir, foldername, filename))
             img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
-            img = img / 255
+            img = img/255
+
+            # Append Resized Image and its label to lists
             images.append(img)
-            # append the labels to the labels list
             labels.append(int(foldername))
 
-    # check if the number of files match the number of labels
-    if len(images) != len(labels):
-        print("the number of files do not match the labels")
-
-    return images, labels
+    return (images, labels)
 
 
 def get_model():
@@ -98,24 +84,39 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    # create the convolutional neural network
+    # Create a convolutional neural network
     model = tf.keras.models.Sequential([
 
-        # convolutional layer, learn 32 filters using a 3X3 kernel
-        tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
-
-        # max pooling layer using a 2X2 pool size (converts the big picture into a 2 by 2 picture)
+        # Convolutional layer. Learn 32 filters using a 3x3 kernel
+        tf.keras.layers.Conv2D(
+            32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
+        ),
+        tf.keras.layers.Normalization(),
+        # Max-pooling layer, using 2x2 pool size
         tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
 
-        # flatten units(makes the data smaller)
+        # Convolutional layer. Learn 64 filters using a 3x3 kernel
+        tf.keras.layers.Conv2D(
+            64, (3, 3), activation="relu", padding='same'),
+        tf.keras.layers.Normalization(),
+        # Max-pooling layer, using 2x2 pool size
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+        # Convolutional layer. Learn 64 filters using a 3x3 kernel
+        tf.keras.layers.Conv2D(
+            128, (3, 3), activation="relu", padding='same'),
+        tf.keras.layers.Normalization(),
+        # Max-pooling layer, using 2x2 pool size
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        # Flatten units
         tf.keras.layers.Flatten(),
 
-        # add a hidden layer with dropout
+        # Add a hidden layer with dropout
         tf.keras.layers.Dense(128, activation="relu"),
         tf.keras.layers.Dropout(0.5),
 
-        # add an output layer with output for all 43 type of singns
-        tf.keras.layers.Dense(43, activation="softmax")
+        # Add an output layer with output units for all 10 digits
+        tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
     ])
 
     # Train neural network
@@ -125,10 +126,8 @@ def get_model():
         metrics=["accuracy"]
     )
 
+    # return the model
     return model
-
 
 if __name__ == "__main__":
     main()
-    
-
