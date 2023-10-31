@@ -62,7 +62,19 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
-    raise NotImplementedError
+    # to remove words
+    removal = list()
+    # tokenise it first
+    tokenised_words = list(nltk.word_tokenize(sentence))
+    # loop to ensure lower case and only keep those one alphabetic character
+    tokenised_words = [word.lower() for word in tokenised_words]
+    for word in tokenised_words:
+        if not word.isalpha():
+            removal.append(word)
+    # remove words that are not alphabetical
+    processed = [word for word in tokenised_words not in removal]
+    # return the words
+    return processed
 
 
 def np_chunk(tree):
@@ -71,6 +83,9 @@ def np_chunk(tree):
     A noun phrase chunk is defined as any subtree of the sentence
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
+    
+    accepts a tree
+    returns a list
     """
     raise NotImplementedError
 
