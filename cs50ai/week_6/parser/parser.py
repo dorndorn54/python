@@ -87,7 +87,17 @@ def np_chunk(tree):
     accepts a tree
     returns a list
     """
-    raise NotImplementedError
+    noun_phrase = list()
+
+    for subtree in tree.subtrees():
+        if subtree.label() == 'NP':
+            for leaf in subtree.leaves():
+                word, tag = leaf
+                if tag.startswith('NP'):
+                    noun_phrase.append(word)
+
+    print(noun_phrase)
+    return noun_phrase
 
 
 if __name__ == "__main__":
