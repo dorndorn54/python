@@ -15,7 +15,10 @@ V -> "smiled" | "tell" | "were"
 """
 
 NONTERMINALS = """
-S -> N V
+S -> NP VP | NP VP Conj NP VP | NP VP Conj VP
+NP -> N | Det N | Det AP N | P NP | NP P NP
+VP -> V | Adv VP | V Adv | VP NP | V NP Adv
+AP -> Adj | AP Adj
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
@@ -62,19 +65,17 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
-    # to remove words
-    removal = list()
-    # tokenise it first
+    # tokenise the sentence
     tokenised_words = list(nltk.word_tokenize(sentence))
     # loop to ensure lower case and only keep those one alphabetic character
     tokenised_words = [word.lower() for word in tokenised_words]
-    for word in tokenised_words:
+    # copy the list and iterate through it removing the non-alphabetic words
+    for word in tokenised_words.copy():
         if not word.isalpha():
-            removal.append(word)
-    # remove words that are not alphabetical
-    processed = [word for word in tokenised_words not in removal]
+            tokenised_words.remove(word)
+
     # return the words
-    return processed
+    return tokenised_words
 
 
 def np_chunk(tree):
@@ -83,22 +84,21 @@ def np_chunk(tree):
     A noun phrase chunk is defined as any subtree of the sentence
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
-    
+
     accepts a tree
     returns a list
     """
-    noun_phrase = list()
+    noun_list = list()
+    # convert to parented tree
+    # this is to ensure each parent is only attached to each tree
+    ptree = nltk.tree.ParentedTree.convert(tree)
+    ptree.pretty_print(unicodelines=True, nodedist=4)
+    # iterate through the subtrees
+    for subtree in ptree.subtrees():
+        if subtree.label() == 'N':
+            noun_list.append(subtree.parent())
 
-    for subtree in tree.subtrees():
-        if subtree.label() == 'NP':
-            for leaf in subtree.leaves():
-                word, tag = leaf
-                if tag.startswith('NP'):
-                    noun_phrase.append(word)
-
-    print(noun_phrase)
-    return noun_phrase
-
-
+    # return the list
+    return noun_list
 if __name__ == "__main__":
     main()
