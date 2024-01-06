@@ -130,9 +130,8 @@ def brute_force_cow_transport(cows,limit=10):
     for count, element in enumerate(total_trips):
         # give empty list for the map function to append to later
         export_list.append([])
-        # total_trips[i] represents the partition
-        # map function accesses each element in the tuple of the partition
-        for j in map(lambda x: x[0], total_trips[count]):
+        # element represents the list of tuples at position count of total_trips
+        for j in map(lambda x: x[0], element):
             # add each name to a new list
             export_list[count].append(j)
 
