@@ -1,15 +1,17 @@
 ###########################
-# 6.0002 Problem Set 1a: Space Cows 
+# 6.0002 Problem Set 1a: Space Cows
 # Name:
 # Collaborators:
 # Time:
 
-from ps1_partition import get_partitions
 import time
+from ps1_partition import get_partitions
 
-#================================
+
+# ================================
 # Part A: Transporting Space Cows
-#================================
+# ================================
+
 
 # Problem 1
 def load_cows(filename):
@@ -37,7 +39,7 @@ def load_cows(filename):
 
 
 # Problem 2
-def greedy_cow_transport(cows,limit=10):
+def greedy_cow_transport(cows, limit=10):
     """
     Uses a greedy heuristic to determine an allocation of cows that attempts to
     minimize the number of spaceship trips needed to transport all the cows. The
@@ -53,40 +55,32 @@ def greedy_cow_transport(cows,limit=10):
     Parameters:
     cows - a dictionary of name (string), weight (int) pairs
     limit - weight limit of the spaceship (an int)
-    
+
     Returns:
     A list of lists, with each inner list containing the names of cows
     transported on a particular trip and the overall list containing all the
     trips
     """
-    final_list = list()
-    # sort the cows into a list of tuples
-    cow_list = sorted(cows.items(), key=lambda x: x[1], reverse=True)
-    trip_count = 0
-    while len(cow_list) > 0:
-        trip_limit = limit
-        # append empty list to add to later
-        final_list.append([])
-        cows_to_remove = list()
-        for cow in cow_list:
-            # add the biggest value possible
-            if cow[1] <= trip_limit:
-                # add the cow name
-                final_list[trip_count].append(cow[0])
-                # add the positon of the cow tuple to remove later
-                cows_to_remove.append(cow_list.index(cow))
-                # update the trip limit
-                trip_limit -= cow[1]
-        trip_count += 1
-    # remove the cows from the list by the position of the cow
-    for cow_index in cows_to_remove:
-        cow_list.pop(cow_index)
-    # return the list back
-    return final_list
+    sorted_cows = sorted(cows.items(), key=lambda x: x[1], reverse=True)
+    result = []   # creating list where results will be appended.
+    trip = 0   # increasing with each trip.
+    while len(sorted_cows) > 0:  # after there is no cow left, the job is done.
+        trip_limit = limit   # sets the initial limit for the trip.
+        result.append([])   # initiating trip sub-list.
+        removed_cows = []  # creating a list with indexes of cows that were already assigned to the trip.
+        for cow in sorted_cows:
+            if cow[1] <= trip_limit:   # checking if weight of cow meets current constraint.
+                result[trip].append(cow[0])
+                removed_cows.append(sorted_cows.index(cow))
+                trip_limit -= cow[1]   # updating the limit for current trip.
+        trip += 1
+        for cow_index in sorted(removed_cows, reverse=True):
+            sorted_cows.pop(cow_index)
+    return result
 
 
 # Problem 3
-def brute_force_cow_transport(cows,limit=10):
+def brute_force_cow_transport(cows, limit=10):
     """
     Finds the allocation of cows that minimizes the number of spaceship trips
     via brute force.  The brute force algorithm should follow the following method:
@@ -95,13 +89,13 @@ def brute_force_cow_transport(cows,limit=10):
         Use the given get_partitions function in ps1_partition.py to help you!
     2. Select the allocation that minimizes the number of trips without making any trip
         that does not obey the weight limitation
-            
+
     Does not mutate the given dictionary of cows.
 
     Parameters:
     cows - a dictionary of name (string), weight (int) pairs
     limit - weight limit of the spaceship (an int)
-    
+
     Returns:
     A list of lists, with each inner list containing the names of cows
     transported on a particular trip and the overall list containing all the
@@ -113,15 +107,15 @@ def brute_force_cow_transport(cows,limit=10):
     # prepare total number of possible iterations
     for partition in get_partitions(cow_list):
         total_trips.append(partition)
-    # make a copy of the trip so does not intefere with iteration
+    # total_trips is a list of a list of a list of tuples
     for trip in total_trips.copy():
-        # iterate through each partition
+        # trip is one possible trip all permutations
         temp_limit = limit
-        for i in map(lambda x: x[1], trip):
+        for journey in trip:
             # check if sum of that partition exceed
-            temp_limit -= i
+            journey_weight = sum(map(lambda x: int(x[1]), journey))
         # if so delete
-        if temp_limit < 0:
+        if temp_limit < journey_weight:
             total_trips.remove(trip)
     # now total_trips is a list of all possible partitions
     # need to convert it to a lists of lists with just names
@@ -137,6 +131,7 @@ def brute_force_cow_transport(cows,limit=10):
 
     return export_list
 
+
 # Problem 4
 def compare_cow_transport_algorithms():
     """
@@ -144,12 +139,32 @@ def compare_cow_transport_algorithms():
     greedy_cow_transport and brute_force_cow_transport functions here. Use the
     default weight limits of 10 for both greedy_cow_transport and
     brute_force_cow_transport.
-    
+
     Print out the number of trips returned by each method, and how long each
     method takes to run in seconds.
 
     Returns:
     Does not return anything.
     """
-    # TODO: Your code here
-    pass
+
+    # run the brute force algorithm first
+    """_summary of brute force algorithm_
+    plain and simple it works but takes fking long time to do so
+    """
+    filename = "ps1_cow_data.txt"
+    cows = load_cows(filename)
+    start = time.time()
+    brute_force_cow_transport(cows, limit=10)
+    end = time.time()
+    print(end - start)
+    """the much better way to complete it even as the size of the file increases
+    """
+    # run the greedy algorithm next
+    filename = "ps1_cow_data.txt"
+    cows = load_cows(filename)
+    start = time.time()
+    greedy_cow_transport(cows, limit=10)
+    end = time.time()
+    print(end - start)
+
+compare_cow_transport_algorithms()
