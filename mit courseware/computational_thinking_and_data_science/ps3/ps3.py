@@ -89,7 +89,7 @@ class RectangularRoom(object):
         # creating the dictionary for the floorplan
         for w in range(width):
             for h in range(height):
-                tiles[(w, h)] = dirt_amount
+                self.tiles[(w, h)] = dirt_amount
         
     def clean_tile_at_position(self, pos, capacity):
         """
@@ -216,7 +216,7 @@ class Robot(object):
         self.capacity = capacity
         # configure the robot position and direction
         self.pos = Position(random.uniform(0, room.width), random.uniform(0, room.height))
-        self.direction = random.randrange(360)  
+        self.direction = random.randrange(360)
 
     def get_robot_position(self):
         """
@@ -267,21 +267,22 @@ class EmptyRoom(RectangularRoom):
         """
         Returns: an integer; the total number of tiles in the room
         """
-        return 
-        
+        return len(self.tiles)
+
     def is_position_valid(self, pos):
         """
         pos: a Position object.
-        
+
         Returns: True if pos is in the room, False otherwise.
         """
-        raise NotImplementedError
+        return self.is_position_in_room(pos)
         
     def get_random_position(self):
         """
         Returns: a Position object; a valid random position (inside the room).
         """
-        raise NotImplementedError
+        # randomly choose from the list of python keys
+        return Position(random.uniform(0, self.width), random.uniform(0, self.height))
 
 class FurnishedRoom(RectangularRoom):
     """
@@ -328,7 +329,9 @@ class FurnishedRoom(RectangularRoom):
         """
         Return True if tile (m, n) is furnished.
         """
-        raise NotImplementedError
+        if (m, n) in self.furniture_tiles:
+            return True
+        return False
         
     def is_position_furnished(self, pos):
         """
@@ -336,27 +339,39 @@ class FurnishedRoom(RectangularRoom):
 
         Returns True if pos is furnished and False otherwise
         """
-        raise NotImplementedError
-        
+        x_cord = math.floor(pos.x)
+        y_cord = math.floor(pos.y)
+        if (x_cord, y_cord) in self.furniture_tiles:
+            return True
+        return False
+
     def is_position_valid(self, pos):
         """
         pos: a Position object.
-        
+
         returns: True if pos is in the room and is unfurnished, False otherwise.
         """
-        raise NotImplementedError
-        
+
+        if self.is_position_furnished(pos) and self.is_position_in_room(pos):
+            return True
+        return False
+
     def get_num_tiles(self):
         """
         Returns: an integer; the total number of tiles in the room that can be accessed.
         """
-        raise NotImplementedError
+        return len(self.tiles)
         
     def get_random_position(self):
         """
-        Returns: a Position object; a valid random position (inside the room and not in a furnished area).
+        Returns: a Position object; a valid random position
+        (inside the room and not in a furnished area).
         """
-        raise NotImplementedError
+        possible_pos = list()
+        for keys in self.tiles:
+            if keys not in self.furniture_tiles:
+                possible_pos.append(keys)
+        return random.choice(possible_pos)
 
 # === Problem 3
 class StandardRobot(Robot):
@@ -372,9 +387,13 @@ class StandardRobot(Robot):
         Simulate the raise passage of a single time-step.
 
         Move the robot to a new random position (if the new position is invalid, 
-        rotate once to a random new direction, and stay stationary) and clean the dirt on the tile
-        by its given capacity. 
+        rotate once to a random new direction, and stay stationary) and clean 
+        the dirt on the tile by its given capacity. 
         """
+        # given the current speed of the robot cal where the robot will go
+        # if the position is valid in the room and no furniture
+        # it will move to that new position
+        # if position not valid it will just rotate to a new direction at its current pos
         raise NotImplementedError
 
 # Uncomment this line to see your implementation of StandardRobot in action!
