@@ -7,6 +7,7 @@ import math
 import numpy as np
 import pylab as pl
 import random
+import statistics
 
 
 ##########################
@@ -88,7 +89,8 @@ class SimpleBacteria(object):
                 probability
             death_prob (float in [0, 1]): Maximum death probability
         """
-        pass  # TODO
+        self.birth_prob = birth_prob
+        self.death_prob = death_prob
 
     def is_killed(self):
         """
@@ -99,7 +101,10 @@ class SimpleBacteria(object):
         Returns:
             bool: True with probability self.death_prob, False otherwise.
         """
-        pass  # TODO
+        check_death = random.random()
+        if check_death <= self.death_prob:
+            return True
+        return False
 
     def reproduce(self, pop_density):
         """
@@ -127,7 +132,14 @@ class SimpleBacteria(object):
         Raises:
             NoChildException if this bacteria cell does not reproduce.
         """
-        pass  # TODO
+        check_birth = random.random()
+        birth_prob = self.birth_prob * (1 - pop_density)
+        if check_birth <= birth_prob:
+            # create carbon copy of exisitng bacteria
+            new_bacteria = SimpleBacteria(self.birth_prob, self.death_prob)
+            return new_bacteria
+        else:
+            raise NoChildException
 
 
 class Patient(object):
@@ -142,7 +154,8 @@ class Patient(object):
             max_pop (int): Maximum possible bacteria population size for
                 this patient
         """
-        pass  # TODO
+        self.bacteria = bacteria
+        self.max_pop = max_pop
 
     def get_total_pop(self):
         """
@@ -151,7 +164,7 @@ class Patient(object):
         Returns:
             int: The total bacteria population
         """
-        pass  # TODO
+        return len(self.bacteria)
 
     def update(self):
         """
@@ -177,7 +190,28 @@ class Patient(object):
         Returns:
             int: The total bacteria population at the end of the update
         """
-        pass  # TODO
+        # step1
+        surving_bacteria = list()
+        for bacteria in self.bacteria:
+            if not bacteria.is_killed():
+                surving_bacteria.append(bacteria)
+
+        # step2
+        curr_pop_density = len(surving_bacteria) / self.max_pop
+
+        # step3
+        additional_bacteria = list()
+        for bacteria in surving_bacteria:
+            try:
+                additional = bacteria.reproduce(curr_pop_density)
+            except NoChildException:
+                continue
+            additional_bacteria.append(additional)
+
+        # step4
+        self.bacteria = surving_bacteria + additional_bacteria
+
+        return len(self.bacteria)
 
 
 ##########################
@@ -195,7 +229,12 @@ def calc_pop_avg(populations, n):
     Returns:
         float: The average bacteria population size at time step n
     """
-    pass  # TODO
+    bacteria_at_n = list()
+    for trials in populations:
+        bacteria_at_n.append(trials[n])
+    avg_pop = statistics.mean(bacteria_at_n)
+
+    return avg_pop
 
 
 def simulation_without_antibiotic(num_bacteria,
@@ -231,11 +270,36 @@ def simulation_without_antibiotic(num_bacteria,
         populations (list of lists or 2D array): populations[i][j] is the
             number of bacteria in trial i at time step j
     """
-    pass  # TODO
+    timesteps = 300
+    populations = list()
+    
+    for trial in range(num_trials):
+        # generate the list of bacteria for the patient
+        simple_bacteria = list()
+        for bacteria in range(num_bacteria):
+            simple_bacteria.append(SimpleBacteria(birth_prob, death_prob))
+        # generate the patient with the given bacteria
+        patient = Patient(simple_bacteria, max_pop)
+        
+        sublist = list()
+        for steps in range(timesteps):
+            if len(sublist) == 0:
+                sublist.append(num_bacteria)
+            else:
+                sublist.append(patient.update())
+        populations.append(sublist)
+        
+    y_cords = list()
+    for steps in range(timesteps):
+        y_cords.append(calc_pop_avg(populations, steps))
+    
+    #print(y_cords)
+    make_one_curve_plot(list(range(300)), y_cords, 'timesteps', 'Average population', 'Without Antibiotic')
 
+    return populations
 
 # When you are ready to run the simulation, uncomment the next line
-# populations = simulation_without_antibiotic(100, 1000, 0.1, 0.025, 50)
+#populations = simulation_without_antibiotic(100, 1000, 0.1, 0.025, 50)
 
 ##########################
 # PROBLEM 3
@@ -262,7 +326,15 @@ def calc_pop_std(populations, t):
         float: the standard deviation of populations across different trials at
              a specific time step
     """
-    pass  # TODO
+    # average population at timestep t
+    pop_t = list()
+    for trials in populations:
+        pop_t.append(trials[t])
+    avg_t = statistics.mean(pop_t)
+    
+    std_dev_cal = list()
+    for pop in pop_t:
+        std_dev_cal.append((pop - pop_t)**2)
 
 
 def calc_95_ci(populations, t):
