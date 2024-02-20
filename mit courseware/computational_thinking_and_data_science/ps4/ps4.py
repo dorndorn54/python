@@ -330,12 +330,11 @@ def calc_pop_std(populations, t):
     pop_t = list()
     for trials in populations:
         pop_t.append(trials[t])
-    avg_t = statistics.mean(pop_t)
-    
-    std_dev_cal = list()
-    for pop in pop_t:
-        std_dev_cal.append((pop - pop_t)**2)
+    mean_t = statistics.mean(pop_t)
 
+    std_dev = (sum([(x - mean_t)**2 for x in pop_t])/len(pop_t))**0.5
+
+    return std_dev
 
 def calc_95_ci(populations, t):
     """
@@ -358,7 +357,16 @@ def calc_95_ci(populations, t):
 
         I.e., you should return a tuple containing (mean, width)
     """
-    pass  # TODO
+    # compute mean and std dev
+    mean = calc_pop_avg(populations, t)
+    std_dev = calc_pop_std(populations, t)
+
+    # calculate the sem
+    sem = std_dev / math.sqrt(len(populations))
+    # calculate the width 
+    width = 1.96 * sem
+
+    return (mean, width)
 
 
 ##########################
@@ -378,11 +386,15 @@ class ResistantBacteria(SimpleBacteria):
                 bacteria cell. This is the maximum probability of the
                 offspring acquiring antibiotic resistance
         """
-        pass  # TODO
+        self.birth_prob = birth_prob
+        self.death_prob = death_prob
+        self.resistant = resistant
+        self.mut_pron = mut_prob
 
     def get_resistant(self):
         """Returns whether the bacteria has antibiotic resistance"""
-        pass  # TODO
+        return self.resistant
+        
 
     def is_killed(self):
         """Stochastically determines whether this bacteria cell is killed in
@@ -396,7 +408,17 @@ class ResistantBacteria(SimpleBacteria):
             bool: True if the bacteria dies with the appropriate probability
                 and False otherwise.
         """
-        pass  # TODO
+        # if resistant die with reg prob
+        # not resistant die with 1/4 prob
+        killed_prob = random.random()
+        if self.get_resistant():
+            if killed_prob <= self.death_prob:
+                return True
+            return False
+        else:
+            if killed_prob <= self.death_prob / 4:
+                return True
+            return False
 
     def reproduce(self, pop_density):
         """
