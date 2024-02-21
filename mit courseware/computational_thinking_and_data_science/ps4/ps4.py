@@ -389,7 +389,7 @@ class ResistantBacteria(SimpleBacteria):
         self.birth_prob = birth_prob
         self.death_prob = death_prob
         self.resistant = resistant
-        self.mut_pron = mut_prob
+        self.mut_prob = mut_prob
 
     def get_resistant(self):
         """Returns whether the bacteria has antibiotic resistance"""
@@ -449,7 +449,26 @@ class ResistantBacteria(SimpleBacteria):
             as this bacteria. Otherwise, raises a NoChildException if this
             bacteria cell does not reproduce.
         """
-        pass  # TODO
+        # check if will reproduce
+        produce_prob = random.random()
+        if produce_prob <= self.birth_prob * (1 - [pop_density]):
+            # check if resistant if so just continue
+            if self.get_resistant():
+                new_bacteria = ResistantBacteria(self.birth_prob, self.death_prob, self.resistant, self.mut_prob)
+                return new_bacteria
+            else:
+                # no resistance calculate the mut_prob
+                mut_prob = random.Random
+                if mut_prob <= (self.mut_prob * (1-pop_density)):
+                    # if succesful then resistance achieved
+                    new_bacteria = ResistantBacteria(self.birth_prob, self.death_prob, True, self.mut_prob)
+                    return new_bacteria
+                else:
+                    # not succesful copy the data and continue
+                    new_bacteria = ResistantBacteria(self.birth_prob, self.death_prob, self.resistant, self.mut_prob)
+                    return new_bacteria
+        # unsuccesful reproduction no child produced    
+        return NoChildException
 
 
 class TreatedPatient(Patient):
@@ -472,14 +491,17 @@ class TreatedPatient(Patient):
         Don't forget to call Patient's __init__ method at the start of this
         method.
         """
-        pass  # TODO
+        super().__init__(bacteria, max_pop)
+        self.on_antibiotic = False
+
 
     def set_on_antibiotic(self):
         """
         Administer an antibiotic to this patient. The antibiotic acts on the
         bacteria population for all subsequent time steps.
         """
-        pass  # TODO
+        self.on_antibiotic = True
+
 
     def get_resist_pop(self):
         """
@@ -488,7 +510,12 @@ class TreatedPatient(Patient):
         Returns:
             int: the number of bacteria with antibiotic resistance
         """
-        pass  # TODO
+        count = 0
+        for bact in self.bacteria:
+            if bact.resistant:
+                count += 1
+        return count
+                
 
     def update(self):
         """
@@ -515,9 +542,24 @@ class TreatedPatient(Patient):
         Returns:
             int: The total bacteria population at the end of the update
         """
-        pass  # TODO
+        # step 1 
+        # iterate through the list of bacteria
+        surviving_bacteria = list()
+        for bact in self.bacteria:
+            if bact.is_killed():
+                surviving_bacteria.append(bact)
 
+        # step 2
+        # iterate through the remaining bact and remove those that are not resistant
+        surv_resistant_bact = list()
+        for bact in surv_resistant_bact:
+            if bact.get_resistant():
+                surv_resistant_bact.append(bact)
 
+        # step 3
+        curr_pop_density = len(surv_resistant_bact) / self.max_pop
+        
+        # step 4
 ##########################
 # PROBLEM 5
 ##########################
