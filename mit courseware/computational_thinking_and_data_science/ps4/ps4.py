@@ -466,7 +466,7 @@ class ResistantBacteria(SimpleBacteria):
                     new_bacteria = ResistantBacteria(self.birth_prob, self.death_prob, self.resistant, self.mut_prob)
                     return new_bacteria
         # unsuccesful reproduction no child produced    
-        return NoChildException
+        raise NoChildException
 
 
 class TreatedPatient(Patient):
@@ -506,7 +506,7 @@ class TreatedPatient(Patient):
         Returns:
             int: the number of bacteria with antibiotic resistance
         """
-        print(self.bacteria)
+        #print(self.bacteria)
         count = 0
         for bacteria in self.bacteria:
             if bacteria.get_resistant():
@@ -614,47 +614,52 @@ def simulation_with_antibiotic(num_bacteria,
             trial i at time step j
     """
     timestep = 400
-    total_population = list()
-    resistant_population = list()
+    total_pop = list()
+    resistant_pop = list()
     
     for trial in range(num_trials):
-        # generate the list of resistant bacteria
+        # instate the bacteria and the environment needed
         resistant_bacteria = list()
         for bacteria in range(num_bacteria):
             resistant_bacteria.append(ResistantBacteria(birth_prob, death_prob, resistant, mut_prob))
-        print(len(resistant_bacteria))
-        # generate a patient
-        patient = TreatedPatient(resistant_bacteria, max_pop)
-
+        # generate the patient
+        treated_patient = TreatedPatient(resistant_bacteria, max_pop)
+        
         total_sublist = list()
         resistant_sublist = list()
         for step in range(timestep):
-            # add the antibiotic after 150 steps
-            if step > 150:
-                patient.set_on_antibiotic()
-                
-            # calculate the total num of bacteria
+            # point at which the antibiotic is added to the system
+            if step == 150:
+                treated_patient.set_on_antibiotic()
+            
+            # check if list is empty if so new one is initalised and numbers need to be added
             if len(total_sublist) == 0:
                 total_sublist.append(num_bacteria)
+                resistant_sublist.append(treated_patient.get_resist_pop())
             else:
-                total_sublist.append(patient.update())
-                # calculate the number of resistant bacteria at each timestep
-                resistant_sublist.append(patient.get_resist_pop())
-        total_population.append(total_sublist)
-        resistant_population.append(resistant_sublist)
+                # update the patient
+                treated_patient.update()
+                # add the baceria data to the list
+                total_sublist.append(treated_patient.get_total_pop())
+                resistant_sublist.append(treated_patient.get_resist_pop())
+            # append the sublist to the mainlist
+            total_pop.append(total_sublist)
+            resistant_pop.append(resistant_sublist)
     
-    # generate the y axis data needed
-    total_y_cords = list()
-    resistant_y_cords = list()
+    # generate the y cords data needed for the graph
+    y_total = list()
+    y_resistant = list()
     for step in range(timestep):
-        total_y_cords.append(calc_pop_avg(total_population, step))
-        resistant_y_cords.append(calc_pop_avg(resistant_population, step))
-    
-    # pot the graph
-    make_two_curve_plot(list(range(300)), total_y_cords, resistant_y_cords, 'Total', 'Resistant', 'Timestep', 'Average Population', 'With an Antibiotic')
+        y_total.append(calc_pop_avg(total_pop, step))
+        y_resistant.append(calc_pop_avg(resistant_pop, step))
 
-    return total_population, resistant_population
-                
+    # print(len(y_total))
+    # print(len(y_resistant))
+    # make the plot
+    make_two_curve_plot(list(range(400)), y_total, y_resistant, 'Total', 'Resistant', 'Timestep', 'Avg Population', 'With an Antibiotic')
+    
+    return total_pop, resistant_pop
+    
 # When you are ready to run the simulations, uncomment the next lines one
 # at a time
 total_pop, resistant_pop = simulation_with_antibiotic(num_bacteria=100,
