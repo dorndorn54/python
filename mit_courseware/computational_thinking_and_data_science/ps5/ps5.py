@@ -6,6 +6,9 @@
 
 import pylab
 import re
+import numpy
+import statistics
+import math
 
 # cities in our weather data
 CITIES = [
@@ -163,8 +166,12 @@ def generate_models(x, y, degs):
         a list of pylab arrays, where each array is a 1-d array of coefficients
         that minimizes the squared error of the fitting polynomial
     """
-    # TODO
-    pass
+    # iterate through the number of degrees and then output the coefficents
+    models = list()
+    for d in degs:
+        model = pylab.polyfit(x, y, d)
+        models.append(model)
+    return models
 
 
 def r_squared(y, estimated):
@@ -180,8 +187,10 @@ def r_squared(y, estimated):
     Returns:
         a float for the R-squared error term
     """
-    # TODO
-    pass
+    error = ((estimated - y)**2).sum()
+    meanError = error/len(y)
+    return 1 - (meanError/numpy.var(y))
+
 
 def evaluate_models_on_training(x, y, models):
     """
@@ -209,8 +218,11 @@ def evaluate_models_on_training(x, y, models):
     Returns:
         None
     """
-    # TODO
-    pass
+    pylab.plot(x, y, 'o', label='Data')
+    for index, item in enumerate(models):
+        est_y = pylab.polyval(models[i], x)
+        error = r_squared(y, est_y)
+        pylab.plot(x, est_y, label='Fit of degree of model' + str(index) + ', R2 = ' + str(round(error, 5)))
 
 def gen_cities_avg(climate, multi_cities, years):
     """
@@ -227,8 +239,19 @@ def gen_cities_avg(climate, multi_cities, years):
         this array corresponds to the average annual temperature over the given
         cities for a given year.
     """
-    # TODO
-    pass
+    # iterate over the years, collect the data from each city on that year
+    # calculate the avg
+    # append the average
+    avg_temp = list()  # final list
+    for year in years:
+        year_temp = list()  # for the given year
+        for city in multi_cities:
+            temp = statistics.mean(climate.get_yearly_temp(city, year))
+            year_temp.append(temp)
+        # avg of each year for all the cities
+        avg_temp.append(statistics.mean(year_temp))
+    return numpy.array(avg_temp)
+
 
 def moving_average(y, window_length):
     """
@@ -244,8 +267,20 @@ def moving_average(y, window_length):
         an 1-d pylab array with the same length as y storing moving average of
         y-coordinates of the N sample points
     """
-    # TODO
-    pass
+    moving_avg = list()
+
+    i = 0
+    while i < window_length + 1:
+        # calculate the current window
+        window_avg = numpy.sum(y[i:i+window_length]) / window_length
+        # append the value to the main list
+        moving_avg.append(window_avg)
+
+        # shift the window down by 1
+        i += 1
+
+    return numpy.array(moving_avg)
+
 
 def rmse(y, estimated):
     """
@@ -260,9 +295,10 @@ def rmse(y, estimated):
     Returns:
         a float for the root mean square error term
     """
-    # TODO
-    pass
-
+    rmse = math.sqrt(numpy.square(numpy.subtract(y, estimated)).mean())
+    
+    return rmse
+    
 def gen_std_devs(climate, multi_cities, years):
     """
     For each year in years, compute the standard deviation over the averaged yearly
@@ -278,8 +314,18 @@ def gen_std_devs(climate, multi_cities, years):
         this array corresponds to the standard deviation of the average annual 
         city temperatures for the given cities in a given year.
     """
-    # TODO
-    pass
+    # a list of the stdev of the avg temp of all cities in a given year
+    std_dev = list()
+    for year in years:
+        year_temp = list()
+        for city in multi_cities:
+            # adding all the temps of the city for the given year
+            year_temp.append(statistics.mean(climate.get_yearly_temp(city, year)))
+        # averaging that year
+        std_dev.append(statistics.stdev(year_temp))
+
+    return numpy.array(std_dev)
+
 
 def evaluate_models_on_testing(x, y, models):
     """
@@ -305,8 +351,7 @@ def evaluate_models_on_testing(x, y, models):
     Returns:
         None
     """
-    # TODO
-    pass
+    # iterate through each regression model
 
 if __name__ == '__main__':
 
