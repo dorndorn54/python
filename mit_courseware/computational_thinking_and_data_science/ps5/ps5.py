@@ -220,7 +220,7 @@ def evaluate_models_on_training(x, y, models):
     """
     pylab.plot(x, y, 'o', label='Data')
     for index, item in enumerate(models):
-        est_y = pylab.polyval(models[i], x)
+        est_y = pylab.polyval(models[index], x)
         error = r_squared(y, est_y)
         pylab.plot(x, est_y, label='Fit of degree of model' + str(index) + ', R2 = ' + str(round(error, 5)))
 
@@ -351,14 +351,41 @@ def evaluate_models_on_testing(x, y, models):
     Returns:
         None
     """
-    # iterate through each regression model
+    # pylab.plot(x, y, 'o', label='Data')
+    # for index, item in enumerate(models):
+    #     est_y = pylab.polyval(models, x)
+    #     error = r_squared(y, est_y)
+    #     pylab.plot(xVals, estYVals, label = 'Fit of Model ' + str(i) + ', R2 = ' + str(round(error, 5)))
+    # pylab.legend(loc='best')
+    # pylab.title('Regression models')
+
+    for model in models:
+        p = pylab.poly1d(model)   # setting degree of polynomial
+        rmse_value = rmse(y, p(x))
+        pylab.figure()
+        pylab.plot(x, y, 'bo', label='Data Points')
+        pylab.plot(x, p(x), 'r-', label='Model')
+        pylab.legend(loc='best')
+        pylab.title(f'Degree of fit: {len(model) - 1} \n RMSE: {rmse_value}')
+        pylab.xlabel('Year')
+        pylab.ylabel('Temperature in Celsius')
+        pylab.show()
 
 if __name__ == '__main__':
 
     pass 
 
     # Part A.4
-    # TODO: replace this line with your code
+    # generate x and y values
+    data_file = Climate('data.csv')
+    temp_x = list()
+    for year in TRAINING_INTERVAL:
+        temp_x.append(data_file.get_daily_temp('NEW YORK', 1, 10, year))
+    x_values = numpy.array(temp_x)
+    y_values = numpy.array(TRAINING_INTERVAL)
+    models = generate_models(x_values, y_values, [1])
+    evaluate_models_on_training(x_values, y_values, models)
+
 
     # Part B
     # TODO: replace this line with your code
