@@ -354,11 +354,17 @@ def evaluate_models_on_testing(x, y, models):
 
 if __name__ == '__main__':
 
-    pass 
-
     # Part A.4
-    # TODO: replace this line with your code
-
+    # provide x values
+    years = list(TRAINING_INTERVAL)
+    y_values = list()
+    climate = Climate('data.csv')
+    for year in years:
+        y_values.append(climate.get_daily_temp('NEW YORK', 1, 10, year))
+    # generate models
+    models = generate_models(pylab.array(years), pylab.array(y_values), [1])
+    # evalute the models on training
+    evaluate_models_on_training(pylab.array(years), pylab.array(y_values), models)
     # Part B
     # TODO: replace this line with your code
 
