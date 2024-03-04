@@ -7,6 +7,7 @@
 import pylab
 import re
 import numpy
+import statistics
 
 # cities in our weather data
 CITIES = [
@@ -307,13 +308,40 @@ def gen_std_devs(climate, multi_cities, years):
         this array corresponds to the standard deviation of the average annual 
         city temperatures for the given cities in a given year.
     """
-    std_dev_per_year = list()
+    # std_dev_cities = list()
+    # for year in years:
+    #     # go through each city and then add the temp at given date
+    #     year_temp = list()
+    #     for city in multi_cities:
+    #         # get the 1 year temp for each city and append to the list year
+    #         city_year_avg = climate.get_yearly_temp(city, year)
+    #         year_temp.append(numpy.mean(city_year_avg))
+    #     # find the std dev at the given year
+    #     std_dev_cities.append(statistics.stdev(year_temp))
+
+    # return pylab.array(std_dev_cities)
+
+    std_devs = []
+
+    #iterate thru years
     for year in years:
-        city_given_year = list()
-        for city in multi_cities:
-            city_given_year.append(numpy.average(climate.get_yearly_temp(city, year)))
-        std_dev_per_year.append(numpy.std(numpy.array(city_given_year)))
-    return numpy.array(std_dev_per_year)
+        #iterate thru cities
+        for city in range(len(multi_cities)):
+            #if its the first city create the array
+            if city == 0:
+                city_list = numpy.array(climate.get_yearly_temp(multi_cities[city],year))
+            #otherwise add up the arrays
+            else:
+                city_list += climate.get_yearly_temp(multi_cities[city],year)
+        #find the average temp at each date
+        city_list = city_list / len(multi_cities)
+        #compute the std and append to the back of the list
+        std = numpy.std(city_list)
+
+        std_devs.append(std)
+        
+    
+    return pylab.array(std_devs)
 
 def evaluate_models_on_testing(x, y, models):
     """
@@ -365,9 +393,17 @@ if __name__ == '__main__':
     models = generate_models(pylab.array(years), pylab.array(y_values), [1])
     # evalute the models on training
     evaluate_models_on_training(pylab.array(years), pylab.array(y_values), models)
+    
     # Part B
-    # TODO: replace this line with your code
+    years = list(TRAINING_INTERVAL)
+    climate = Climate('data.csv')
+    y_values = gen_cities_avg(climate, CITIES, list(TRAINING_INTERVAL))
 
+    # generate the models
+    models = generate_models(pylab.array(years), y_values, [1])
+    # evalute the models
+    evaluate_models_on_training(pylab.array(years), y_values, models)
+    
     # Part C
     # TODO: replace this line with your code
 
@@ -375,4 +411,14 @@ if __name__ == '__main__':
     # TODO: replace this line with your code
 
     # Part E
-    # TODO: replace this line with your code
+    # calculate the std_dev of all the cities
+    climate = Climate('data.csv')
+    std_dev = gen_std_devs(climate, CITIES, list(TRAINING_INTERVAL))
+    # compute the 5 year moving average
+    window_length = 5
+    moving_avg = moving_average(std_dev, window_length)
+    
+    # generate the model
+    model = generate_models(list(TRAINING_INTERVAL), moving_avg, [1])
+    # evalute models
+    evaluate_models_on_training(pylab.array(list(TRAINING_INTERVAL)), moving_avg, model)
