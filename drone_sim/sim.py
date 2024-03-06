@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-X_VAL = 100
-Y_VAL = 100
-Z_VAL = 100
+X_VAL = 300
+Y_VAL = 300
+Z_VAL = 300
 
 class object3D:
     def __init__(self, x=0, y=0, z=0):
@@ -33,7 +33,7 @@ class Drone(object3D):
         Args:
             human (_class_): _a human class_
         """
-        distance =  np.sqrt((self.x - human.x)**2 + (self.y - human.y)**2 + (self.z - human.z)**2)
+        distance = np.sqrt((self.x - human.x)**2 + (self.y - human.y)**2 + (self.z - human.z)**2)
         # if dt fail just return false
         if distance <= self.signal_range:
             # else check the signal cone component 
@@ -104,8 +104,8 @@ def generate_humans(count, environment):
     max_y_value = environment.length
     
     for _ in range(count):
-        x = random.randint(0, max_x_value)
-        y = random.randint(0, max_y_value)
+        x = random.uniform(0, max_x_value)
+        y = random.uniform(0, max_y_value)
         
         # generate the human
         human = Human(x, y, 0)
@@ -125,9 +125,9 @@ def generate_drone(count, environment, signal_range, cone_angle):
     max_x_value, max_y_value, max_z_value = environment.provide_dimensions()
     
     for _ in range(count):
-        x = random.randint(0, max_x_value)
-        y = random.randint(0, max_y_value)
-        z = random.randint(0, max_z_value)
+        x = random.uniform(0, max_x_value)
+        y = random.uniform(0, max_y_value)
+        z = random.uniform(0, max_z_value)
         
         # generate the drone
         drone = Drone(x, y, z, signal_range, cone_angle)
