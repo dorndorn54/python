@@ -9,13 +9,15 @@ import random
 SAMPLE_COUNT = 100
 API_KEY = 'AIzaSyBERVxAAHAu31mUxVmtEoF8KWYhWBfwm3g'
 
-boundary_cords = [(37.75, -122.45),
-                   (37.75, -122.35),
-                   (37.85, -122.35),
-                   (37.85, -122.45),
-                   (37.75, -122.45)]
-# the boundary cords should be a list of sets
+cords = [(37.75, -122.45),
+        (37.75, -122.35),
+        (37.85, -122.35),
+        (37.85, -122.45),
+        (37.75, -122.45)]
 
+boundary_cords = np.array(cords)
+
+# the boundary cords should be a list of sets
 
 def generate_sample_points(boundary_cords, sample_points):
     """generates the sample points to gather elevation data
@@ -57,18 +59,27 @@ def fetch_elevation_data(coordinates, api_key):
         coordinates (_type_): _description_
         api_key (_type_): _description_
     """
-    base_url = 'https://maps.googleapis.com/maps/api/elevation/json'
-    locations = '|'.join(f'{lat},{lng}' for lat, lng in coordinates)
-    params = {
-        'locations': locations,
-        'key': api_key
-    }
-    response = requests.get(base_url, params=params)
-    data = response.json()
-    elevations = [result['elevation'] for result in data['results']]
+    elevations = list()
 
-    return elevations
-
+    for lat, lng in coordinates:
+        # Google Maps Elevation API endpoint
+        url = f"https://maps.googleapis.com/maps/api/elevation/json?locations={lat},{lng}&key={api_key}"
+        # send requests to the api
+        response = requests.get(url)
+        # check if the request was succesful
+        if response.status_code == 200:
+            data = response.json()
+            # Check if API returned valid results
+            if 'results' in data and len(data['results']) > 0:
+                elevation = data['results'][0]['elevation']
+                elevations.append(elevation)
+            else:
+                print("No results found.")
+                return None
+        else:
+            print("Failed to retrieve data.")
+            return None
+    
 
 def plot_map(boundary_cords):
     """plots a map of the area simulated
