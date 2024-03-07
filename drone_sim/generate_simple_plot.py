@@ -63,13 +63,27 @@ def generate_points(x_limit, y_limit, num_points):
     points = list()
     
     # generate the points to build up the polygon
-    percentage = 0.9
-    x_value_to_pick = list(range(-x_limit, round(percentage*-x_limit))) + list(range(round(percentage*x_limit), x_limit)
-    y_value_to_pick = list(range(-y_limit, round(percentage*-y_limit))) + list(range(round(percentage*y_limit), y_limit)
-    
-    # iterate through the num of points needed                                                                                             
     for _ in range(num_points):
-        x_value = random.choice(x_value_to_pick)
-        y_value = random.choice(y_value_to_pick)
+        x_value = random.uniform(-x_limit, x_limit)
+        y_value = random.uniform(-y_limit, y_limit)
+        points.append((x_value, y_value))
+    
+    return points
 
-            
+def generate_plot(x_limit, y_limit, z_limit, num_points):
+    """1 function provide vertices and plot the graph
+
+    Args:
+        x_limit (int): x limit
+        y_limit (int): y limit
+        z_limit (int): z limit
+        num_points (int): the number of points for the polygon
+    """
+    # generate the points for the polygon
+    shape_vertices = generate_points(x_limit, y_limit, num_points)
+    # generate the room
+    room = Room(x_limit, y_limit, z_limit, shape_vertices)
+    # show the room plot
+    room.plot_room()
+
+generate_plot(200, 200, 200, 5)
