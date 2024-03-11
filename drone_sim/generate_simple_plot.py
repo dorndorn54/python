@@ -15,7 +15,7 @@ np.random.seed(0)
 
 
 class Room:
-    def __init__(self, width, length, height, outer_polygon, inner_polygon, phones):
+    def __init__(self, width, length, height, outer_polygon, inner_polygon, phones, drones):
         """a room for the drone to fly in 
 
         Args:
@@ -32,6 +32,7 @@ class Room:
         self.outer_polygon = outer_polygon
         self.inner_polygon = inner_polygon
         self.phones = phones
+        self.drones = drones
         
     def is_inside(self, x, y):
         """checks if the drone is inside the outer pentagon

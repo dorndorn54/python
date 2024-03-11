@@ -61,3 +61,36 @@ class Drone:
         ])
 
         return vertices
+
+
+def intersection_points(outer_polygon, perpendicular_distance):
+    """returns a list of points along the outer polygon for the drone
+    to travel to 
+
+    Args:
+        outer_polygon (class): polygon class
+        perpendicular_distance (float): the distance separating the lines
+
+    Returns:
+        list: x and y coordinates
+    """
+    boundary_points = np.array(outer_polygon.exterior)
+    intersection_points = list()
+    
+    for i in range(len(boundary_points) - 1):
+        # definind the line segment points
+        p1, p2 = boundary_points[i:i+2]
+
+        # calculate the direction vector ux and uy
+        dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+        length = np.sqrt(dx**2 + dy**2)
+        ux, uy = dx / length, dy / length
+        
+        # calculates the number of lines needed based on drone coverage
+        num_lines = int(length / dl)
+        increment_x, increment_y = dl * ux, dl * uy
+        current_point = p1
+
+        intersection_points.extend([current_point := (current_point[0] + increment_x, current_point[1] + increment_y) for _ in range(num_lines)])
+
+    return intersection_points
