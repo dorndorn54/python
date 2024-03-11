@@ -1,7 +1,6 @@
 from shapely.geometry import Polygon, Point
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 import random
 
 random.seed(0)
@@ -10,14 +9,12 @@ FREQUENCY = 2.4*(10**9)
 TRANSMITTED_POWER = 20
 
 class Phone:
-    def __init__(self, x, y, frequency, transmitted_power):
+    def __init__(self,x, y, frequency = FREQUENCY, transmitted_power = TRANSMITTED_POWER):
         """the phone class that would represent a phone emitting an RF signal
 
         Args:
-            x (float): =x position
-            y (float): y position
-            frequency (hz): the frequency of the phone signal
-            transmitted_power (dbm): the signal strength of the phone at 1m
+            frequency (hz): the frequency of the phone signal (configured in the subfile)
+            transmitted_power (dbm): the signal strength of the phone at 1m (connfigured in the subfile)
         """
         self.x = x
         self.y = y
@@ -74,18 +71,25 @@ def generate_points_in_pentagon(pentagons, num_people):
     Returns:
         list: a list of phone classes
     """
-    points = list()
-    for pentagon in pentagons:
-        min_x, min_y, max_x, max_y = pentagon.bounds
-        # random num_people per given area of the pentagon
-        num_points = random.random.randint(0, num_people)
-        while len(points) < num_points:
-            random_x = np.random.uniform(min_x, max_x)
-            random_y = np.random.uniform(min_y, max_y)
-            if pentagon.contains(Point(random_x, random_y)):
-                points.append(Point(random_x, random_y))
+    def generate_random_point_in_polygon(polygon):
+        min_x, min_y, max_x, max_y = polygon.bounds
+        while True:
+            point = Point(np.random.uniform(min_x, max_x), np.random.uniform(min_y, max_y))
+            if polygon.contains(point):
+                return point
+    
+    def generate_point(pentagons, num_people):
+        all_points = []
+        for inner_polygon in pentagons:
+            points = []
+            while len(points) < num_people:
+                random_point = generate_random_point_in_polygon(inner_polygon)
+                points.append(random_point)
+            all_points.extend(points)
+        return all_points
 
     phones = list()
+    points = generate_point(pentagons, num_people)
     # generate the phones at each points
     for point in points:
         phone = Phone(point.x, point.y, FREQUENCY, TRANSMITTED_POWER)

@@ -1,4 +1,5 @@
 from shapely.geometry import Polygon, Point
+from shapely.ops import cascaded_union
 import math
 import random
 import numpy as np
@@ -35,37 +36,31 @@ class Polygons:
 
         return Polygon(coordinates)
 
-    def generate_random_pentagons(self, outer_polygon, num_pentagons):
-        """generates random smaller pentagons inside the outer polygon
+    def generate_random_pentagons(self, outer_polygon, num_pentagons, rad):
+        """generates smaller circles inside the bigger polygon
 
         Args:
-            outer_polygon (class): the polygon class
-            num_pentagons (int): the number of smaller pentagons to be plotted
+            outer_polygon (class): polygon class
+            num_pentagons (class): polygon class
+            radius (float): radius of the circle
 
         Returns:
-            list: a list of smaller pentagon class to be plotted later
+            list: a list of inner polygons
         """
-        pentagons = list()
-        min_x, min_y, max_x, max_y = outer_polygon.bounds
-        # Calculate maximum pentagon size based on the outer polygon
-        pentagon_radius = min(outer_polygon.bounds[2] - outer_polygon.bounds[0], outer_polygon.bounds[3] - outer_polygon.bounds[1]) / 20
-
-        for _ in range(num_pentagons):
-            # Generate a random position within the outer polygon with enough distance from the boundary
+        def generate_random_point_in_polygon(polygon):
+            min_x, min_y, max_x, max_y = polygon.bounds
             while True:
-                random_point = (np.random.uniform(min_x + pentagon_radius, max_x*0.8 - pentagon_radius),
-                                np.random.uniform(min_y + pentagon_radius, max_y*0.8 - pentagon_radius))
-                if outer_polygon.contains(Point(random_point)):
-                    break
+                point = Point(np.random.uniform(min_x, max_x), np.random.uniform(min_y, max_y))
+                if polygon.contains(point):
+                    return point
+        
+        inner_polygons = []
+        for _ in range(num_pentagons):
+            random_point = generate_random_point_in_polygon(outer_polygon)
+            radius = rad / 10 # Adjust this value as needed
+            circle = random_point.buffer(radius)
+            inner_polygon = circle.intersection(outer_polygon)
+            if inner_polygon.area > 0:
+                inner_polygons.append(inner_polygon)
 
-            # Generate vertices for the pentagon
-            vertices = []
-            for i in range(5):
-                angle = 2 * math.pi * i / 5
-                vertex_x = random_point[0] + pentagon_radius * math.cos(angle)
-                vertex_y = random_point[1] + pentagon_radius * math.sin(angle)
-                vertices.append((vertex_x, vertex_y))
-
-            # Create polygon from generated vertices
-            pentagons.append(Polygon(vertices))
-        return pentagons
+        return inner_polygons
