@@ -53,7 +53,7 @@ class Phone:
         # calculate the path loss using the log-dt path loss model
         path_loss = self.transmitted_power - 10 * path_loss_exponent * np.log10(distance)
         # add random noise to simulate environmental effects
-        noise = np.random.normal(loc=0, scale=noise_std_dev, size=len(distance))
+        noise = np.random.normal(loc=0, scale=noise_std_dev)
         # simulate RSSI with natural variation
         rssi = path_loss + noise
 
@@ -96,3 +96,4 @@ def generate_points_in_pentagon(pentagons, num_people):
         phones.append(phone)
 
     return phones
+

@@ -2,10 +2,16 @@ import random
 import math
 from shapely.geometry import Polygon, Point
 import matplotlib.pyplot as plt
+import numpy as np
 
 # class imports
 from polygon_class import Polygons as poly
 from signal_simulation import generate_points_in_pentagon as generate_phones
+
+# constants
+DRONE_HEIGHT = 100
+random.seed(0)
+np.random.seed(0)
 
 
 class Room:
@@ -39,6 +45,26 @@ class Room:
         """
         point = Point(x, y, 0)
         return self.outer_polygon.contains(point)
+    
+    def calculate_rssi_at_position(self):
+        """calculates the rssi value at a given position
+        needs to be updated to receive the values from the drones
+        """
+        def generate_random_point_in_polygon(polygon):
+            min_x, min_y, max_x, max_y = polygon.bounds
+            while True:
+                point = Point(np.random.uniform(min_x, max_x), np.random.uniform(min_y, max_y))
+                if polygon.contains(point):
+                    return point
+        
+        point = generate_random_point_in_polygon(self.outer_polygon)
+        rssi = list()
+        for phone in self.phones:
+            rssi.append(phone.calculate_rssi([point.x, point.y, DRONE_HEIGHT]))
+        # print(point.x, point.y)
+        # print(len(rssi))
+        print(rssi)
+        return np.mean(rssi)
 
     def plot_room(self):
         """plots the room in which the drone is flying in 
@@ -56,7 +82,6 @@ class Room:
         # Fill in the phones in the inner polygons
         for phone in self.phones:
             ax.scatter(phone.x, phone.y, zs=0, zdir='z', color='g', marker='o', s=1)
-            
 
         # Set plot labels and title
         ax.set_xlabel('X')
@@ -84,15 +109,18 @@ def generate_plot(x_limit, y_limit, z_limit, num_sides, num_clusters, max_people
     polygon_class = poly(x_limit, y_limit, num_sides)
     outer_polygon = polygon_class.generate_outer_polygon()
     inner_polygons = polygon_class.generate_random_pentagons(outer_polygon, num_clusters, x_limit)
-    
+
     # generate the phones to be in the room
     phones = generate_phones(inner_polygons, max_people_cluster)
-    
+
     # generate the room
     room = Room(x_limit, y_limit, z_limit, outer_polygon, inner_polygons, phones)
-    
+
     # show the room plot
     room.plot_room()
 
+    # show rssi value
+    print(room.calculate_rssi_at_position())
 
-generate_plot(10000, 10000, 10000, 10, 4, 10)
+
+generate_plot(100, 100, 100, 10, 4, 10)
