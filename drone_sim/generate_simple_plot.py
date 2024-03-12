@@ -7,6 +7,8 @@ import numpy as np
 # class imports
 from polygon_class import Polygons as poly
 from signal_simulation import generate_points_in_pentagon as generate_phones
+from drone import Drone, intersection_points as ip
+
 
 # constants
 DRONE_HEIGHT = 100
@@ -33,7 +35,8 @@ class Room:
         self.inner_polygon = inner_polygon
         self.phones = phones
         self.drones = drones
-        
+
+
     def is_inside(self, x, y):
         """checks if the drone is inside the outer pentagon
 
@@ -46,7 +49,7 @@ class Room:
         """
         point = Point(x, y, 0)
         return self.outer_polygon.contains(point)
-    
+
     def calculate_rssi_at_position(self):
         """calculates the rssi value at a given position
         needs to be updated to receive the values from the drones
@@ -57,7 +60,7 @@ class Room:
                 point = Point(np.random.uniform(min_x, max_x), np.random.uniform(min_y, max_y))
                 if polygon.contains(point):
                     return point
-        
+
         point = generate_random_point_in_polygon(self.outer_polygon)
         rssi = list()
         for phone in self.phones:
@@ -83,6 +86,8 @@ class Room:
         # Fill in the phones in the inner polygons
         for phone in self.phones:
             ax.scatter(phone.x, phone.y, zs=0, zdir='z', color='g', marker='o', s=1)
+        for point in self.points:
+            ax.scatter(phone[0], phone[1], zs=0, zdir='z', color='r', marker='o', s=1)
 
         # Set plot labels and title
         ax.set_xlabel('X')
