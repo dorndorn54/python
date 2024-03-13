@@ -7,7 +7,6 @@ import numpy as np
 # class imports
 from polygon_class import Polygons as poly
 from signal_simulation import generate_points_in_pentagon as generate_phones
-from drone import Drone, intersection_points as ip
 
 
 # constants
@@ -17,7 +16,7 @@ np.random.seed(0)
 
 
 class Room:
-    def __init__(self, width, length, height, outer_polygon, inner_polygon, phones, drones):
+    def __init__(self, width, length, height, outer_polygon, inner_polygon, phones):
         """a room for the drone to fly in 
 
         Args:
@@ -34,8 +33,6 @@ class Room:
         self.outer_polygon = outer_polygon
         self.inner_polygon = inner_polygon
         self.phones = phones
-        self.drones = drones
-
 
     def is_inside(self, x, y):
         """checks if the drone is inside the outer pentagon

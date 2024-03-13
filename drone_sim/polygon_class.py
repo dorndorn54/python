@@ -33,7 +33,7 @@ class Polygons:
             x = self.outer_x_limit * math.cos(i * angle_increment) + generate_displacement(self.outer_x_limit)
             y = self.outer_y_limit * math.sin(i * angle_increment) + generate_displacement(self.outer_y_limit)
             coordinates.append((x, y))
-
+        print(coordinates)
         return Polygon(coordinates)
 
     def generate_random_pentagons(self, outer_polygon, num_pentagons, rad):
