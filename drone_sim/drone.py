@@ -147,8 +147,6 @@ class x_algorithm:
 
         return subpolygons
 
-<<<<<<< HEAD
-=======
     def generate_liner_ring(self, subpolygon):
         """convert the subpolygon to linear ring
 
@@ -243,4 +241,4 @@ def generate_points(polygon, grid_size, distance):
         return points
     
     return generate_points_on_perimeter_and_inside(polygon, grid_size, distance)
->>>>>>> 7274fd40893fe9545a93fe2147ddcbb80d709eb0
+
