@@ -48,6 +48,20 @@ class Drone:
             int: the remaing flytime of the drone
         """
         return self.flytime
+    
+    def coverage_width(self):
+        """calculates the width of the fov of the drone
+
+        Returns:
+            float: the width
+        """
+        # coverage angle in radian
+        cov_rad = np.radians(self.coverage_angle)
+        
+        # calculate the length of the fov
+        side_length = self.z * np.tan(cov_rad / 2)
+        
+        return side_length
 
     def coverage_fov(self):
         """plots the square coverage box for the drone
@@ -59,7 +73,7 @@ class Drone:
         cov_rad = np.radians(self.coverage_angle)
 
         # calculate the half side length of the square coverage area
-        half_side_length = 2 * self.z * np.tan(cov_rad / 2)
+        half_side_length = self.z * np.tan(cov_rad / 2) / 2 
 
         # coordinates for the box
         vertices = np.array([
@@ -71,7 +85,7 @@ class Drone:
 
         return vertices
 
-class cellular_decomposition:
+class x_algorithm:
     def __init__(self, polygon, drone):
         """the cellular decomp search algorithm
 
@@ -133,3 +147,100 @@ class cellular_decomposition:
 
         return subpolygons
 
+<<<<<<< HEAD
+=======
+    def generate_liner_ring(self, subpolygon):
+        """convert the subpolygon to linear ring
+
+        Args:
+            subpolygons (class): a polygon of the polygon class
+
+        Returns:
+            ring: the area for the robot to navigate in
+        """
+        vertices_coords = subpolygon.exterior.coords
+        # generate the ring
+        ring = f2c.LinearRing()
+
+        # iterate through the coordinates
+        for coords in vertices_coords:
+            # generate the point
+            point = f2c.Point(coords[0], coords[2])
+            # append the point to the ring
+            ring.addPoint(point)
+
+        return ring
+
+    def generate_drone(self):
+        """generates the robot used to explore the area
+
+        Returns:
+            robot class: the robot
+        """
+        robot = f2c.Robot(self.drone.coverage_width(), 0)
+        return robot
+
+
+def generate_points(polygon, grid_size, distance):
+    """generates the points that the drone must hit
+
+    Args:
+        polygon (class): the polygon class
+        grid_size (float): the size of the grid to determine the resolution of the plot points
+        distance (float): the distance between the points
+        
+    Return:
+        list: a list of x and y coordinates of the points
+    """
+
+    def generate_equidistant_points(polygon, distance):
+        equidistant_points = []
+        # Iterate through the exterior coordinates of the polygon
+        for i in range(len(polygon.exterior.coords) - 1):
+            # Get the start and end points of the line segment
+            start_point = polygon.exterior.coords[i]
+            end_point = polygon.exterior.coords[i + 1]
+            
+            # Create a LineString from the start and end points
+            line = LineString([start_point, end_point])
+            
+            # Calculate the length of the line segment
+            segment_length = line.length
+            
+            # Calculate the number of points to distribute along the line segment
+            num_points = int(segment_length / distance)
+            
+            # Calculate the step size along the line segment
+            step_size = segment_length / num_points
+            
+            # Iterate along the line segment and add equidistant points
+            for j in range(num_points):
+                # Interpolate a point along the line segment
+                point = line.interpolate(j * step_size)
+                equidistant_points.append(point.coords[0])
+        
+        # Add the last point of the polygon
+        equidistant_points.append(polygon.exterior.coords[-1])
+        
+        return equidistant_points
+
+    def generate_points_on_perimeter_and_inside(polygon, grid_size, distance):
+        # Generate equidistant points along the perimeter
+        equidistant_points = generate_equidistant_points(polygon, distance)
+        
+        # Generate points inside the polygon using a grid-based approach
+        min_x, min_y, max_x, max_y = polygon.bounds
+        grid_points = []
+        for x in np.arange(min_x, max_x, grid_size):
+            for y in np.arange(min_y, max_y, grid_size):
+                point = Point(x, y)
+                if polygon.contains(point):
+                    grid_points.append((x, y))
+
+        # Combine the lists of equidistant points and grid points
+        points = equidistant_points + grid_points
+        
+        return points
+    
+    return generate_points_on_perimeter_and_inside(polygon, grid_size, distance)
+>>>>>>> 7274fd40893fe9545a93fe2147ddcbb80d709eb0
