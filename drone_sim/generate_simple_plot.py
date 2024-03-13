@@ -3,6 +3,7 @@ import math
 from shapely.geometry import Polygon, Point
 import matplotlib.pyplot as plt
 import numpy as np
+import fields2cover as f2c
 
 # class imports
 from polygon_class import Polygons as poly
