@@ -65,4 +65,3 @@ def generate_linear_ring(coordinates):
         ring.addPoint(p)
 
     return ring
-
