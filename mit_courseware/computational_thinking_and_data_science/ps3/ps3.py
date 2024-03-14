@@ -48,15 +48,15 @@ class Position(object):
         Returns: a Position object representing the new position.
         """
         old_x, old_y = self.get_x(), self.get_y()
-        
+
         # Compute the change in position
         delta_y = speed * math.cos(math.radians(angle))
         delta_x = speed * math.sin(math.radians(angle))
-        
+
         # Add that to the existing position
         new_x = old_x + delta_x
         new_y = old_y + delta_y
-        
+
         return Position(new_x, new_y)
 
     def __str__(self):  
@@ -141,19 +141,6 @@ class RectangularRoom(object):
         tiles = list(self.tiles.values())
         return tiles.count(0)
     
-    def is_position_in_room(self, pos):
-        """
-        Determines if pos is inside the room.
-
-        pos: a Position object.
-        Returns: True if pos is in the room, False otherwise.
-        """
-        x_cord = math.floor(pos.x)
-        y_cord = math.floor(pos.y)
-        if (x_cord, y_cord) in self.tiles:
-            return True
-        return False
-
     def get_dirt_amount(self, m, n):
         """
         Return the amount of dirt on the tile (m, n)
