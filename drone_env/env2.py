@@ -138,8 +138,24 @@ class obstacleRoom(RectangularRoom):
         RectangularRoom.__init__(self, width, length)
         # Adds the data structure to contain the list of obstacle tiles
         self.obstacle_tiles = []
-        
-    def add_obstacles_to_room(self):
+    
+    def get_dimensions(self):
+        """provides the dimensions of the given space
+
+        Returns:
+            tuple: (width, length)
+        """
+        return (self.width, self.length)
+
+    def get_obstacles(self):
+        """provides the obstacles of the given space
+
+        Returns:
+            list: list of obstacles as a tuple (x,y)
+        """
+        return self.obstacle_tiles
+    
+    def add_obstacles_to_room(self, obstacles):
         """
         Add a rectangular piece of obstacle to the room. obstacle tiles are stored 
         as (x, y) tuples in the list obstacle_tiles 
@@ -150,20 +166,22 @@ class obstacleRoom(RectangularRoom):
         bottom left corner of the piece of obstacle so that the entire piece of 
         obstacle lies in the room.
         """
-        
+        count = 0
         # This addobstacleToRoom method is implemented for you. Do not change it.
-        obstacle_width = random.randint(1, self.width - 1)
-        obstacle_length = random.randint(1, self.length - 1)
+        while count < obstacles:
+            obstacle_width = random.randint(1, self.width - 1)
+            obstacle_length = random.randint(1, self.length - 1)
 
-        # Randomly choose bottom left corner of the obstacle item.    
-        o_bottom_left_x = random.randint(0, self.width - obstacle_width)
-        o_bottom_left_y = random.randint(0, self.length - obstacle_length)
+            # Randomly choose bottom left corner of the obstacle item.    
+            o_bottom_left_x = random.randint(0, self.width - obstacle_width)
+            o_bottom_left_y = random.randint(0, self.length - obstacle_length)
 
-        # Fill list with tuples of obstacle tiles.
-        for i in range(o_bottom_left_x, o_bottom_left_x + obstacle_width):
-            for j in range(o_bottom_left_y, o_bottom_left_y + obstacle_length):
-                if (i, j) not in self.obstacle_tiles:
-                    self.obstacle_tiles.append((i, j))
+            # Fill list with tuples of obstacle tiles.
+            for i in range(o_bottom_left_x, o_bottom_left_x + obstacle_width):
+                for j in range(o_bottom_left_y, o_bottom_left_y + obstacle_length):
+                    if (i, j) not in self.obstacle_tiles:
+                        self.obstacle_tiles.append((i, j))
+                        count += 1
 
     def is_tile_obstacle(self, m, n):
         """

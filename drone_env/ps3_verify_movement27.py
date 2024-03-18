@@ -6,6 +6,7 @@ import random
 import ps3_visualize
 import pylab
 
+OBSTACLES = 3
 
 def test_robot_movement(robot_type, room_type):
     # check if room is obstacle room
@@ -13,7 +14,7 @@ def test_robot_movement(robot_type, room_type):
     
     room = room_type(5, 5)
     if is_obstacle:
-        room.add_obstacles_to_room()
+        room.add_obstacles_to_room(OBSTACLES)
     robots = [robot_type(room, 1, 1000)]
     coverage = 0
     time_steps = 0
