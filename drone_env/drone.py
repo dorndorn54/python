@@ -9,6 +9,7 @@ import numpy
 from ps3_verify_movement27 import test_robot_movement
 
 from env2 import obstacleRoom as oR
+from return_home import a_star
 
 # === Provided class Position
 class Position(object):
@@ -158,6 +159,6 @@ class Standarddrone(drone):
         # if position not valid it will just rotate at position
         else:
             self.set_drone_direction(random.randrange(360))
-
+        
 
 test_robot_movement(Standarddrone, oR)
