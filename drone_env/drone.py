@@ -67,7 +67,7 @@ class drone(object):
     Subclasses would provide movement stratergies via update_position_and_sweep
     providing a single time step
     """
-    def __init__(self, room, speed, runtime):
+    def __init__(self, room, speed,):
         """Initalises a drone with a given speed in a room, it also has a specified
         runtime to indicate how long it can run for
 
@@ -78,7 +78,6 @@ class drone(object):
         """
         self.room = room
         self.speed = speed
-        self.runtime = runtime
         # configure the drone position and direction
         self.pos = Position(0, 0)
         self.direction = 0
@@ -138,6 +137,22 @@ class Standarddrone(drone):
     direction; when it would hit a wall or furtniture, it *instead*
     chooses a new direction randomly.
     """
+    def return_home(self):
+        pos = self.get_drone_position()
+        curr_pos = (math.floor(pos.get_x()), math.floor(pos.get_y()))
+        home = (0, 0)
+        room = self.room
+        path = a_star(curr_pos, home, room)
+
+        if path is None:
+            self.set_drone_position(Position(0, 0))
+        else:
+            pos_path = []
+            for coordinates in path:
+                pos_path.append(Position(coordinates[0], coordinates[1]))
+            
+        return pos_path
+
     def update_position_and_sweep(self):
         """
         Simulate the raise passage of a single time-step.
@@ -159,6 +174,6 @@ class Standarddrone(drone):
         # if position not valid it will just rotate at position
         else:
             self.set_drone_direction(random.randrange(360))
-        
+
 
 test_robot_movement(Standarddrone, oR)

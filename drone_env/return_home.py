@@ -3,6 +3,8 @@ import heapq
  
 # Define the Cell class
 class Cell:
+    """the cell class for for the a* algorithm
+    """
     def __init__(self):
         self.parent_i = 0  # Parent cell's row index
         self.parent_j = 0  # Parent cell's column index
@@ -10,25 +12,71 @@ class Cell:
         self.g = float('inf')  # Cost from start to this cell
         self.h = 0  # Heuristic cost from this cell to destination
  
-# Check if a cell is valid (within the grid)
+
 def is_valid(row, col, COL, ROW):
+    """checks if the cell is within the grid
+
+    Args:
+        row (int): y coordinate
+        col (int): x coordinate
+        COL (int): the number of columns in the grid
+        ROW (int): the number of rows in the grid
+
+    Returns:
+        BOOL: True if valid, False if invalid
+    """
     return (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
- 
-# Check if a cell is unblocked
+
+
 def is_unblocked(grid, row, col):
+    """check if the cell is blocked
+
+    Args:
+        grid (dictionary): the grid used in the algorithm
+        row (int): y coordinate
+        col (int): x coordinate
+
+    Returns:
+        BOOL: True if no obstacle, False if there is an obstacle
+    """
     return grid[row][col] == 1
  
-# Check if a cell is the destination
+
 def is_destination(row, col, dest):
+    """checks if the cell is the destination
+
+    Args:
+        row (int): y coordinate
+        col (int): x coordinate
+        dest (tuple): y, x coordinate
+
+    Returns:
+        BOOL: True if destination reached, False if destination not reached
+    """
     return row == dest[0] and col == dest[1]
  
-# Calculate the heuristic value of a cell (Euclidean distance to destination)
+
 def calculate_h_value(row, col, dest):
+    """calculates the h value for the a* algorithm
+
+    Args:
+        row (int): y coordinate
+        col (int): x coordinate
+        dest (tuple): y, x coordiante
+
+    Returns:
+        float: the heuristic value
+    """
     return ((row - dest[0]) ** 2 + (col - dest[1]) ** 2) ** 0.5
- 
-# Trace the path from source to destination
+
+
 def trace_path(cell_details, dest):
-    print("The Path is ")
+    """traces the path from the src to the destination
+
+    Args:
+        cell_details (class): the cell class
+        dest (tuple): y, x coordinate
+    """
     path = []
     row = dest[0]
     col = dest[1]
@@ -42,17 +90,27 @@ def trace_path(cell_details, dest):
         col = temp_col
  
     # Add the source cell to the path
-    path.append((row, col))
+    path.append((col, row))
     # Reverse the path to get the path from source to destination
     path.reverse()
- 
-    # Print the path
-    for i in path:
-        print("->", i, end=" ")
-    print()
- 
-# Implement the A* search algorithm
+  
+    return path
+    # # Print the path
+    # for i in path:
+    #     print("->", i, end=" ")
+    # print()
+
+
 def a_star_search(grid, src, dest, COL, ROW):
+    """the engine for the a* algorithm
+
+    Args:
+        grid (dictionary): the grid of the map
+        src (tuple): y, x coordinate
+        dest (tuple): y, x coordinate
+        COL (int): max width of the grid
+        ROW (int): max length of the grid
+    """
     # Check if the source and destination are valid
     if not is_valid(src[0], src[1], COL, ROW) or not is_valid(dest[0], dest[1], COL, ROW):
         print("Source or destination is invalid")
@@ -114,9 +172,9 @@ def a_star_search(grid, src, dest, COL, ROW):
                     cell_details[new_i][new_j].parent_j = j
                     print("The destination cell is found")
                     # Trace and print the path from source to destination
-                    trace_path(cell_details, dest)
+                    path = trace_path(cell_details, dest)
                     found_dest = True
-                    return
+                    return path
                 else:
                     # Calculate the new f, g, and h values
                     g_new = cell_details[i][j].g + 1.0
@@ -165,4 +223,5 @@ def a_star(curr_pos, home, room):
         grid[y][x] = 0
 
     # Run the A* search algorithm
-    a_star_search(grid, src, dest, COL, ROW)
+    return a_star_search(grid, src, dest, COL, ROW)
+    
