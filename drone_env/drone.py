@@ -138,6 +138,11 @@ class Standarddrone(drone):
     chooses a new direction randomly.
     """
     def return_home(self):
+        """generates a list of coordinates for the drone to return home
+
+        Returns:
+            _type_: _description_
+        """
         pos = self.get_drone_position()
         curr_pos = (math.floor(pos.get_x()), math.floor(pos.get_y()))
         home = (0, 0)
@@ -176,4 +181,45 @@ class Standarddrone(drone):
             self.set_drone_direction(random.randrange(360))
 
 
-test_robot_movement(Standarddrone, oR)
+#test_robot_movement(Standarddrone, oR)
+
+
+def run_simulation(speed, width, length, min_coverage, num_trials):
+    """run num_trials of the simulation and return the mean number of
+    timesteps needed to cover the entire area 
+
+    Args:
+        speed (int): speed of the robot
+        width (int): width of the room
+        length (int): length of the room
+        min_coverage (float): the coverage goal for the room
+        num_trials (int): the number of trials to be executed
+
+    Returns:
+        int: average of all the timesteps
+    """
+    timesteps = list()
+
+    for _ in range(num_trials):
+        # initalise the empty room
+        Room = oR(width, length)
+        tile_count = Room.get_num_tiles()
+        explored_tiles = Room.get_num_explored_tiles
+
+        drone = Standarddrone(Room, speed)
+
+        # loop through and check if clean else continue
+        count = 0
+        while (explored_tiles / tile_count) < min_coverage:
+            drone.update_position_and_sweep()
+            explored_tiles = Room.get_num_explored_tiles()
+            count += 1
+        pos_path = drone.return_home()
+        for position in pos_path:
+            timesteps += 1
+            drone.set_drone_position(position)
+            count += 1
+        # repeat and append the score to the list
+        timesteps.append(count)
+
+    return round(numpy.average(timesteps))

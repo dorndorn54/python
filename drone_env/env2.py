@@ -173,8 +173,8 @@ class obstacleRoom(RectangularRoom):
             obstacle_length = random.randint(1, self.length - 1)
 
             # Randomly choose bottom left corner of the obstacle item.    
-            o_bottom_left_x = random.randint(0, self.width - obstacle_width)
-            o_bottom_left_y = random.randint(0, self.length - obstacle_length)
+            o_bottom_left_x = random.randint(obstacle_width, self.width - obstacle_width)
+            o_bottom_left_y = random.randint(obstacle_length, self.length - obstacle_length)
 
             # Fill list with tuples of obstacle tiles.
             for i in range(o_bottom_left_x, o_bottom_left_x + obstacle_width):
