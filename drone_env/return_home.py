@@ -90,10 +90,10 @@ def trace_path(cell_details, dest):
         col = temp_col
  
     # Add the source cell to the path
-    path.append((col, row))
+    path.append((row, col))
     # Reverse the path to get the path from source to destination
     path.reverse()
-  
+    print(path)
     return path
     # # Print the path
     # for i in path:
@@ -195,7 +195,7 @@ def a_star_search(grid, src, dest, COL, ROW):
     # If the destination is not found after visiting all cells
     if not found_dest:
         print("Failed to find the destination cell")
-
+        
 
 def a_star(curr_pos, home, room):
     """generates the a* algorithm to retur home

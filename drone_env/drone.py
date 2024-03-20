@@ -116,6 +116,17 @@ class drone(object):
         direction: float representing an angle in degrees
         """
         self.direction = direction
+    
+    def check_home(self):
+        """check if the drone is home
+
+        Returns:
+            BOOL: True if home, False if not home
+        """
+        home = Position(0, 0)
+        
+        if home == self.get_drone_position():
+            return True
 
     def update_position_and_sweep(self):
         """
@@ -147,14 +158,14 @@ class Standarddrone(drone):
         curr_pos = (math.floor(pos.get_x()), math.floor(pos.get_y()))
         home = (0, 0)
         room = self.room
-        path = a_star(curr_pos, home, room)
+        path = a_star(curr_pos, home, room)  # the coordinates are in (y,x) format
 
         if path is None:
             self.set_drone_position(Position(0, 0))
         else:
             pos_path = []
             for coordinates in path:
-                pos_path.append(Position(coordinates[0], coordinates[1]))
+                pos_path.append(Position(coordinates[1], coordinates[0]))
             
         return pos_path
 
@@ -181,7 +192,18 @@ class Standarddrone(drone):
             self.set_drone_direction(random.randrange(360))
 
 
-#test_robot_movement(Standarddrone, oR)
+test_robot_movement(Standarddrone, oR, 5, 5, 3)
+""" to visualise the movement of the drone
+
+Args:
+    Standarddrone (class): drone type
+    oR (class): room type
+    10 (int): room width
+    10 (int): room length
+    5 (int): the number of obstacles in the room
+"""
+
+
 
 
 def run_simulation(speed, width, length, min_coverage, num_trials):

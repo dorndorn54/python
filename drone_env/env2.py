@@ -155,33 +155,39 @@ class obstacleRoom(RectangularRoom):
         """
         return self.obstacle_tiles
     
-    def add_obstacles_to_room(self, obstacles):
-        """
-        Add a rectangular piece of obstacle to the room. obstacle tiles are stored 
-        as (x, y) tuples in the list obstacle_tiles 
-        
-        obstacle location and size is randomly selected. Width and length are selected
-        so that the piece of obstacle fits within the room and does not occupy the 
-        entire room. Position is selected by randomly selecting the location of the 
-        bottom left corner of the piece of obstacle so that the entire piece of 
-        obstacle lies in the room.
-        """
-        count = 0
-        # This addobstacleToRoom method is implemented for you. Do not change it.
-        while count < obstacles:
-            obstacle_width = random.randint(1, self.width - 1)
-            obstacle_length = random.randint(1, self.length - 1)
+    def add_obstacles_to_room(self, num_obstacles):
+        """generates num_obstacles number of obstacles that would
+        be generated and appended to the self.obstacles_tiles list
 
-            # Randomly choose bottom left corner of the obstacle item.    
-            o_bottom_left_x = random.randint(obstacle_width, self.width - obstacle_width)
-            o_bottom_left_y = random.randint(obstacle_length, self.length - obstacle_length)
+        Args:
+            num_obstacles (int): the number of obstacles to be generated
+        """
+        obstacles = []
+        min_gap = math.floor(self.width * 0.2)
+        while len(obstacles) < num_obstacles:
+            # Generate random width, length, and position for each obstacle
+            width = random.randint(1, math.floor(self.width * 0.3))
+            length = random.randint(1, math.floor(self.length * 0.3))
+            x = random.randint(1, self.width - width)
+            y = random.randint(1, self.length - length)
+            
+            # Check if the obstacle overlaps with existing obstacles
+            overlaps = False
+            for obstacle in obstacles:
+                if (x < obstacle[0] + obstacle[2] + min_gap and x + width + min_gap> obstacle[0] and
+                    y < obstacle[1] + obstacle[3] + min_gap and y + length + min_gap > obstacle[1]):
+                    overlaps = True
+                    break
+            
+            # If no overlap, add the obstacle to the list
+            if not overlaps:
+                obstacles.append((x, y, width, length))
+                
+        for obstacle in obstacles:
+            for x in range(obstacle[0], obstacle[0] + obstacle[2]):
+                for y in range(obstacle[1], obstacle[1] + obstacle[2]):
+                    self.obstacle_tiles.append((x, y))
 
-            # Fill list with tuples of obstacle tiles.
-            for i in range(o_bottom_left_x, o_bottom_left_x + obstacle_width):
-                for j in range(o_bottom_left_y, o_bottom_left_y + obstacle_length):
-                    if (i, j) not in self.obstacle_tiles:
-                        self.obstacle_tiles.append((i, j))
-                        count += 1
 
     def is_tile_obstacle(self, m, n):
         """
