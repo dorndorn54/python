@@ -10,16 +10,21 @@ import pylab
 def test_robot_movement(robot_type, room_type, room_width, room_length, obstacles):
     # check if room is obstacle room
     is_obstacle = str(room_type).find('obstacleRoom') > 0
+    is_circular = str(room_type).find('circularRoom') > 0
     
     room = room_type(room_width, room_length)
     if is_obstacle:
         room.add_obstacles_to_room(obstacles)
+    elif is_circular:
+        room.add_obstacles_to_room()
     robots = [robot_type(room, 1)]
     coverage = 0
     time_steps = 0
     min_coverage = 1.0
     if is_obstacle:
-        anim = ps3_visualize.RobotVisualization(1, room_width, room_length, room.obstacle_tiles) 
+        anim = ps3_visualize.RobotVisualization(1, room_width, room_length, room.obstacle_tiles)
+    elif is_circular:
+        anim = ps3_visualize.RobotVisualization(1, room_width, room_length, room.obstacle_tiles)
     else:
         anim = ps3_visualize.RobotVisualization(1, 5, 5, [])  
     while coverage < min_coverage:

@@ -40,5 +40,13 @@ class bsd_drone(drone):
             
         return pos_path
 
-class bos_cellular_decomp(object):
-    def __init__(self):
+class convert_graph(object):
+    def __init__(self, map):
+        
+
+class graph_env(object):
+    def __init__(self, room, start_corner, end_corner, max_steps):
+        self.episode_steps = 0
+        self.reward = 0
+        self.done = False
+        self.SIZE = 2

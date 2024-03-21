@@ -9,6 +9,7 @@ import numpy
 from ps3_verify_movement27 import test_robot_movement
 
 from env2 import obstacleRoom as oR
+from env2 import circularRoom as cR
 from return_home import a_star
 
 # === Provided class Position
@@ -192,7 +193,8 @@ class Standarddrone(drone):
             self.set_drone_direction(random.randrange(360))
 
 
-test_robot_movement(Standarddrone, oR, 5, 5, 3)
+#test_robot_movement(Standarddrone, oR, 5, 5, 3)
+test_robot_movement(Standarddrone, cR, 10, 10, None)
 """ to visualise the movement of the drone
 
 Args:

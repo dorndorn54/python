@@ -237,3 +237,115 @@ class obstacleRoom(RectangularRoom):
             if keys not in self.obstacle_tiles:
                 possible_pos.append(keys)
         return random.choice(possible_pos)
+
+
+class circularRoom(RectangularRoom):
+    """
+    A obstacleRoom represents a RectangularRoom with a rectangular piece of 
+    obstacle. The robot should not be able to land on these obstacle tiles.
+    """
+    def __init__(self, width, length):
+        """ 
+        Initializes a obstacleRoom, a subclass of RectangularRoom. obstacleRoom
+        also has a list of tiles which are obstacle (obstacle_tiles).
+        """
+        # This __init__ method is implemented for you -- do not change.
+        
+        # Call the __init__ method for the parent class
+        RectangularRoom.__init__(self, width, length)
+        # Adds the data structure to contain the list of obstacle tiles
+        self.obstacle_tiles = []
+    
+    def get_dimensions(self):
+        """provides the dimensions of the given space
+
+        Returns:
+            tuple: (width, length)
+        """
+        return (self.width, self.length)
+
+    def get_obstacles(self):
+        """provides the obstacles of the given space
+
+        Returns:
+            list: list of obstacles as a tuple (x,y)
+        """
+        return self.obstacle_tiles
+    
+    def add_obstacles_to_room(self):
+        """generates num_obstacles number of obstacles that would
+        be generated and appended to the self.obstacles_tiles list
+
+        Args:
+            num_obstacles (int): the number of obstacles to be generated
+        """
+        center_x = self.width / 2
+        center_y = self.length / 2
+        
+        radius = min(center_x, center_y) - 1
+        
+        # axes
+        axes = list()
+        for _ in range(3):
+            x_axe = random.randint(1, math.floor(center_x * 0.5))
+            y_axe = random.randint(1, math.floor(center_y * 0.5))
+            axes.append((x_axe, y_axe))
+
+        # Define the corners to add obstacles
+        corners = [(0, self.length-1), (self.width-1, self.length-1), (self.width-1, 0)]
+
+        for corner, (semi_major, semi_minor) in zip(corners, axes):
+            corner_x, corner_y = corner
+            for x in range(self.width):
+                for y in range(self.length):
+                    if ((x - corner_x) / semi_major)**2 + ((y - corner_y) / semi_minor)**2 <= 1:
+                        self.obstacle_tiles.append((x, y))
+
+    def is_tile_obstacle(self, m, n):
+        """
+        Return True if tile (m, n) is obstacle.
+        """
+        if (m, n) in self.obstacle_tiles:
+            return True
+        return False
+        
+    def is_position_obstacle(self, pos):
+        """
+        pos: a Position object.
+
+        Returns True if pos is obstacle and False otherwise
+        """
+        x_cord = math.floor(pos.get_x())
+        y_cord = math.floor(pos.get_y())
+        if (x_cord, y_cord) in self.obstacle_tiles:
+            return True
+        return False
+
+    def is_position_valid(self, pos):
+        """
+        pos: a Position object.
+
+        returns: True if pos is in the room Fand is unobstacle, False otherwise.
+        """
+
+        if (self.is_position_obstacle(pos) is False) and self.is_position_in_room(pos):
+            return True
+        return False
+
+    def get_num_tiles(self):
+        """
+        Returns: an integer; the total number of tiles in the room that can be accessed.
+        the number of obstacle tiles must be deducted
+        """
+        return len(self.tiles) - len(self.obstacle_tiles)
+        
+    def get_random_position(self):
+        """
+        Returns: a Position object; a valid random position
+        (inside the room and not in a obstacle area).
+        """
+        possible_pos = list()
+        for keys in self.tiles:
+            if keys not in self.obstacle_tiles:
+                possible_pos.append(keys)
+        return random.choice(possible_pos)
