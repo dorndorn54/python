@@ -11,6 +11,7 @@ from ps3_verify_movement27 import test_robot_movement
 from env2 import obstacleRoom as oR
 from env2 import circularRoom as cR
 from return_home import a_star
+from distance_calculator import distance_travelled_drone
 
 # === Provided class Position
 class Position(object):
@@ -75,13 +76,13 @@ class drone(object):
         Args:
             room (class): the room class
             speed (int): speed of the drone
-            runtime (int): how long the drone can operate in meters
         """
         self.room = room
         self.speed = speed
         # configure the drone position and direction
         self.pos = Position(0, 0)
         self.direction = 0
+        self.prev_pos = [Position(0, 0)]
 
     def get_drone_position(self):
         """
@@ -101,6 +102,14 @@ class drone(object):
         degrees, 0.0 <= d < 360.0.
         """
         return self.direction
+    
+    def get_drone_all_position(self):
+        """returns a list of the drones prev position
+
+        Returns:
+            list: a list of the positions
+        """
+        return self.prev_pos
 
     def set_drone_position(self, position):
         """
@@ -109,6 +118,7 @@ class drone(object):
         position: a Position object.
         """
         self.pos = position
+        self.update_prev_pos(position)
 
     def set_drone_direction(self, direction):
         """
@@ -128,6 +138,14 @@ class drone(object):
         
         if home == self.get_drone_position():
             return True
+
+    def update_prev_pos(self, new_pos):
+        """update all the positions that the drone has visited
+
+        Args:
+            new_pos (class): the position class
+        """
+        self.prev_pos.append(new_pos)
 
     def update_position_and_sweep(self):
         """
@@ -194,7 +212,7 @@ class Standarddrone(drone):
 
 
 #test_robot_movement(Standarddrone, oR, 5, 5, 3)
-test_robot_movement(Standarddrone, cR, 10, 10, None)
+#test_robot_movement(Standarddrone, cR, 10, 10, None)
 """ to visualise the movement of the drone
 
 Args:
@@ -204,9 +222,6 @@ Args:
     10 (int): room length
     5 (int): the number of obstacles in the room
 """
-
-
-
 
 def run_simulation(speed, width, length, min_coverage, num_trials):
     """run num_trials of the simulation and return the mean number of

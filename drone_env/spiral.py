@@ -13,8 +13,8 @@ from return_home import a_star
 from drone import drone, Position
 
 
-class bsd_drone(drone):
-    """A drone that follows the Boustrophedon-cell-decomposition
+class circular_drone(drone):
+    """A drone that follows the circular pattern
 
     Args:
         drone (class): drone class from the main drone
@@ -40,13 +40,9 @@ class bsd_drone(drone):
             
         return pos_path
 
-class split_map(object):
-    """this class serves to split up the given map into a few regions
-    when it meets an obstacle it will split the area before as 1 unit
+    def update_position_and_sweep(self):
 
-    Args:
-        object (_type_): _description_
-    """
-    def __init__(self, room, drone_count):
-        self.room = room
-        self.drone_count = drone_count
+class circular_path(object):
+    def __init__(self, drone):
+        self.drone = drone
+        self.room = self.drone.room

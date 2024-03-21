@@ -97,7 +97,7 @@ class RobotVisualization:
                 x2, y2 = self._map_coords(i + 1, j + 1)
                 if (not room.is_tile_explored(i, j) and not self.obstacle_tiles) or (not room.is_tile_explored(i, j) and not room.is_tile_obstacle(i, j)):
                     #get dirt amount
-                    check = room.get_tile_scanned(i, j)
+                    check = room.is_tile_explored(i, j)
                     if check:
                         dirtAmount = 1
                     else:

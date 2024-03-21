@@ -93,7 +93,7 @@ def trace_path(cell_details, dest):
     path.append((row, col))
     # Reverse the path to get the path from source to destination
     path.reverse()
-    print(path)
+    # print(path)
     return path
     # # Print the path
     # for i in path:
@@ -158,7 +158,7 @@ def a_star_search(grid, src, dest, COL, ROW):
         closed_list[i][j] = True
  
         # For each direction, check the successors
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
         for dir in directions:
             new_i = i + dir[0]
             new_j = j + dir[1]

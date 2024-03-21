@@ -6,12 +6,14 @@ import random
 import ps3_visualize
 import pylab
 
+from distance_calculator import distance_travelled_drone as dtd
+
 
 def test_robot_movement(robot_type, room_type, room_width, room_length, obstacles):
     # check if room is obstacle room
     is_obstacle = str(room_type).find('obstacleRoom') > 0
     is_circular = str(room_type).find('circularRoom') > 0
-    
+    print(robot_type)
     room = room_type(room_width, room_length)
     if is_obstacle:
         room.add_obstacles_to_room(obstacles)
@@ -33,15 +35,17 @@ def test_robot_movement(robot_type, room_type, room_width, room_length, obstacle
             robot.update_position_and_sweep()
             anim.update(room, robots)
             coverage = float(room.get_num_explored_tiles())/room.get_num_tiles()
-    
-    if robot.check_home():
-        time_steps += 1
-        anim.done()
+    for robot in robots:
+        if robot.check_home():
+            time_steps += 1
+            anim.done()
     else:
         pos_path = robot.return_home()
         for position in pos_path:
             time_steps += 1
             robot.set_drone_position(position)
             anim.update(room, robots)
-
+    # # CHECK DISTANCE
+    # for robot in robots:
+    #     print(dtd(robot))
         anim.done()

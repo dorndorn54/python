@@ -84,18 +84,6 @@ class RectangularRoom(object):
             return False
         else:
             return True
-    
-    def get_tile_scanned(self, m, n):
-        """checks if the tile has been scanned
-
-        Args:
-            m (int): x_coord
-            n (int): y_coord
-
-        Returns:
-            BOOL: True if scanned, False if not scanned
-        """
-        return self.tiles[(m, n)]
         
     def get_num_tiles(self):
         """
@@ -187,7 +175,6 @@ class obstacleRoom(RectangularRoom):
             for x in range(obstacle[0], obstacle[0] + obstacle[2]):
                 for y in range(obstacle[1], obstacle[1] + obstacle[2]):
                     self.obstacle_tiles.append((x, y))
-
 
     def is_tile_obstacle(self, m, n):
         """
@@ -281,8 +268,6 @@ class circularRoom(RectangularRoom):
         """
         center_x = self.width / 2
         center_y = self.length / 2
-        
-        radius = min(center_x, center_y) - 1
         
         # axes
         axes = list()
