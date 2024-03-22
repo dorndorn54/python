@@ -80,7 +80,7 @@ class drone(object):
         self.room = room
         self.speed = speed
         # configure the drone position and direction
-        self.pos = Position(0, 0)
+        self.pos = Position(0.5, 0.5)
         self.direction = 0
         self.prev_pos = [Position(0, 0)]
 
