@@ -55,4 +55,5 @@ class map_generator(object):
 
 
 map = map_generator(10, 10)
+map.gen_corner_obstacle(0.1, 0.1, top.right)
 map.save_map("map_1", "map_data")
