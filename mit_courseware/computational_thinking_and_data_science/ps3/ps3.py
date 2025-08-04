@@ -141,6 +141,20 @@ class RectangularRoom(object):
         tiles = list(self.tiles.values())
         return tiles.count(0)
     
+    def is_position_in_room(self, pos):
+        """
+        Determines if pos is inside the room.
+
+        pos: a Position object.
+        Returns: True if pos is in the room, False otherwise.
+        """
+        if pos.get_x() >= self.width or pos.get_y() >= self.height:
+            return False
+        elif pos.get_x() < 0 or pos.get_y() < 0:
+            return False
+        else:
+            return True
+    
     def get_dirt_amount(self, m, n):
         """
         Return the amount of dirt on the tile (m, n)
@@ -462,7 +476,7 @@ class FaultyRobot(Robot):
             else:
                 self.set_robot_direction(random.randrange(360))
             
-#test_robot_movement(FaultyRobot, EmptyRoom)
+test_robot_movement(FaultyRobot, EmptyRoom)
 
 # === Problem 5
 def run_simulation(num_robots, speed, capacity, width, height, dirt_amount, min_coverage, num_trials,
